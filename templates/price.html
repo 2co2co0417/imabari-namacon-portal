@@ -21,32 +21,18 @@
       </div>
       <div class="card-b">
 
-        <div class="mix-search-grid">
-          <div>
-            <label for="strength" class="field-label">呼び強度</label>
-            <select id="strength" class="input-like">
-              <option value="">選択してください</option>
-              <option value="18">18</option>
-              <option value="21">21</option>
-              <option value="24">24</option>
-              <option value="27">27</option>
-              <option value="30">30</option>
-              <option value="33">33</option>
-              <option value="36">36</option>
-              <option value="40">40</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="slump" class="field-label">スランプ</label>
-            <select id="slump" class="input-like">
-              <option value="">選択してください</option>
-            </select>
-          </div>
+        <div style="margin-bottom:18px;">
+          <div class="field-label">呼び強度</div>
+          <div class="btn-group" id="strengthButtons"></div>
         </div>
 
-        <div style="margin-top:18px;">
-          <div class="field-label" style="margin-bottom:8px;">骨材</div>
+        <div style="margin-bottom:18px;">
+          <div class="field-label">スランプ</div>
+          <div class="btn-group" id="slumpButtons"></div>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <div class="field-label">骨材</div>
           <div class="btn-group" id="aggButtons">
             <button type="button" data-v="15">15mm</button>
             <button type="button" data-v="20">20mm</button>
@@ -54,8 +40,8 @@
           </div>
         </div>
 
-        <div style="margin-top:18px;">
-          <div class="field-label" style="margin-bottom:8px;">セメント</div>
+        <div style="margin-bottom:18px;">
+          <div class="field-label">セメント</div>
           <div class="btn-group" id="cementButtons">
             <button type="button" data-v="N">N</button>
             <button type="button" data-v="BB">BB</button>
@@ -138,26 +124,10 @@
 </div>
 
 <style>
-  .mix-search-grid{
-    display:grid;
-    gap:14px;
-    grid-template-columns:repeat(2, minmax(180px, 1fr));
-  }
-
   .field-label{
     display:block;
     font-weight:700;
-    margin-bottom:6px;
-  }
-
-  .input-like{
-    width:100%;
-    height:44px;
-    border:1px solid #d7e2de;
-    border-radius:10px;
-    padding:0 12px;
-    background:#fff;
-    font-size:15px;
+    margin-bottom:8px;
   }
 
   .btn-group{
@@ -174,12 +144,17 @@
     background:#fff;
     cursor:pointer;
     font-weight:700;
+    transition:.15s ease;
   }
 
   .btn-group button.active{
     background:#2f9488;
     color:#fff;
     border-color:#2f9488;
+  }
+
+  .btn-group button.hidden{
+    display:none;
   }
 
   .price-box{
@@ -210,16 +185,11 @@
     text-align:left;
     white-space:nowrap;
   }
-
-  @media (max-width: 640px){
-    .mix-search-grid{
-      grid-template-columns:1fr;
-    }
-  }
 </style>
 
 <script>
   const priceData = [
+    /* 20mm */
     {strength:18, slump:8,  agg:20, price:23000},
     {strength:18, slump:12, agg:20, price:23100},
     {strength:18, slump:15, agg:20, price:23300},
@@ -229,43 +199,23 @@
     {strength:21, slump:12, agg:20, price:23500},
     {strength:21, slump:15, agg:20, price:23700},
     {strength:21, slump:18, agg:20, price:23900},
-    {strength:21, slump:21, agg:20, price:25200},
 
     {strength:24, slump:8,  agg:20, price:23600},
     {strength:24, slump:12, agg:20, price:23800},
     {strength:24, slump:15, agg:20, price:24000},
     {strength:24, slump:18, agg:20, price:24300},
-    {strength:24, slump:21, agg:20, price:25600},
 
     {strength:27, slump:8,  agg:20, price:24000},
     {strength:27, slump:12, agg:20, price:24200},
     {strength:27, slump:15, agg:20, price:24400},
     {strength:27, slump:18, agg:20, price:24700},
-    {strength:27, slump:21, agg:20, price:26100},
 
     {strength:30, slump:8,  agg:20, price:24300},
     {strength:30, slump:12, agg:20, price:24600},
     {strength:30, slump:15, agg:20, price:24800},
     {strength:30, slump:18, agg:20, price:25100},
-    {strength:30, slump:21, agg:20, price:26500},
 
-    {strength:33, slump:8,  agg:20, price:25000},
-    {strength:33, slump:12, agg:20, price:25000},
-    {strength:33, slump:15, agg:20, price:25200},
-    {strength:33, slump:18, agg:20, price:25500},
-    {strength:33, slump:21, agg:20, price:26900},
-
-    {strength:36, slump:8,  agg:20, price:25000},
-    {strength:36, slump:12, agg:20, price:25200},
-    {strength:36, slump:15, agg:20, price:25400},
-    {strength:36, slump:18, agg:20, price:25600},
-    {strength:36, slump:21, agg:20, price:26800},
-
-    {strength:40, slump:8,  agg:20, price:25800},
-    {strength:40, slump:12, agg:20, price:25800},
-    {strength:40, slump:15, agg:20, price:26100},
-    {strength:40, slump:18, agg:20, price:27900},
-
+    /* 40mm */
     {strength:18, slump:5,  agg:40, price:22600},
     {strength:18, slump:8,  agg:40, price:22800},
     {strength:18, slump:12, agg:40, price:22900},
@@ -291,18 +241,19 @@
     {strength:30, slump:15, agg:40, price:24500}
   ];
 
-  const slumpOptions = {
-    15: [8, 12, 15, 18, 21],
-    20: [8, 12, 15, 18, 21],
-    40: [5, 8, 12, 15]
-  };
+  const strengthMaster = [18, 21, 24, 27, 30];
+  const slumpMaster = [5, 8, 12, 15, 18];
 
-  const strengthEl = document.getElementById("strength");
-  const slumpEl = document.getElementById("slump");
+  let selectedStrength = 18;
+  let selectedSlump = 8;
+  let selectedAgg = 20;
+  let selectedCement = "N";
+
+  const strengthButtonsEl = document.getElementById("strengthButtons");
+  const slumpButtonsEl = document.getElementById("slumpButtons");
+  const aggButtonsEl = document.getElementById("aggButtons");
+  const cementButtonsEl = document.getElementById("cementButtons");
   const resultEl = document.getElementById("priceResult");
-
-  let selectedAgg = null;
-  let selectedCement = null;
 
   function formatYen(value){
     return value.toLocaleString("ja-JP") + "円 / m³";
@@ -312,29 +263,46 @@
     return `${strength}-${slump}-${agg}${cement}`;
   }
 
-  function updateSlumpOptions(){
-    const list = slumpOptions[selectedAgg] || [];
-    const current = slumpEl.value;
-
-    slumpEl.innerHTML = '<option value="">選択してください</option>';
-
-    list.forEach(v => {
-      const op = document.createElement("option");
-      op.value = v;
-      op.textContent = v;
-      slumpEl.appendChild(op);
-    });
-
-    if (list.includes(Number(current))) {
-      slumpEl.value = current;
-    }
+  function createButton(value, active = false){
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.dataset.v = value;
+    btn.textContent = value;
+    if (active) btn.classList.add("active");
+    return btn;
   }
 
-  function setActiveButton(containerId, value){
-    const container = document.getElementById(containerId);
+  function setActiveButton(container, value){
     container.querySelectorAll("button").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.v === String(value));
     });
+  }
+
+  function hasPrice(strength, slump, agg){
+    const baseAgg = (agg === 15) ? 20 : agg;
+    return priceData.some(p =>
+      p.strength === strength &&
+      p.slump === slump &&
+      p.agg === baseAgg
+    );
+  }
+
+  function getAvailableStrengths(agg){
+    const baseAgg = (agg === 15) ? 20 : agg;
+    return [...new Set(
+      priceData
+        .filter(p => p.agg === baseAgg)
+        .map(p => p.strength)
+    )].sort((a, b) => a - b);
+  }
+
+  function getAvailableSlumps(agg, strength){
+    const baseAgg = (agg === 15) ? 20 : agg;
+    return [...new Set(
+      priceData
+        .filter(p => p.agg === baseAgg && p.strength === strength)
+        .map(p => p.slump)
+    )].sort((a, b) => a - b);
   }
 
   function renderDefaultMessage(){
@@ -346,22 +314,69 @@
     `;
   }
 
-  function searchPrice(){
-    const strength = Number(strengthEl.value);
-    const slump = Number(slumpEl.value);
-    const agg = Number(selectedAgg);
-    const cement = selectedCement;
+  function renderStrengthButtons(){
+    const available = getAvailableStrengths(selectedAgg);
+    strengthButtonsEl.innerHTML = "";
 
-    if (!strength || !slump || !agg || !cement){
+    if (!available.includes(selectedStrength)) {
+      if (available.includes(18)) {
+        selectedStrength = 18;
+      } else {
+        selectedStrength = available.length ? available[0] : null;
+      }
+    }
+
+    strengthMaster.forEach(v => {
+      const btn = createButton(v, selectedStrength === v);
+      if (!available.includes(v)) {
+        btn.classList.add("hidden");
+      }
+      strengthButtonsEl.appendChild(btn);
+    });
+  }
+
+  function renderSlumpButtons(){
+    slumpButtonsEl.innerHTML = "";
+
+    if (!selectedStrength) {
+      slumpMaster.forEach(v => {
+        const btn = createButton(v, false);
+        btn.classList.add("hidden");
+        slumpButtonsEl.appendChild(btn);
+      });
+      return;
+    }
+
+    const available = getAvailableSlumps(selectedAgg, selectedStrength);
+
+    if (!available.includes(selectedSlump)) {
+      if (available.includes(8)) {
+        selectedSlump = 8;
+      } else {
+        selectedSlump = available.length ? available[0] : null;
+      }
+    }
+
+    slumpMaster.forEach(v => {
+      const btn = createButton(v, selectedSlump === v);
+      if (!available.includes(v)) {
+        btn.classList.add("hidden");
+      }
+      slumpButtonsEl.appendChild(btn);
+    });
+  }
+
+  function searchPrice(){
+    if (!selectedStrength || !selectedSlump || !selectedAgg || !selectedCement){
       renderDefaultMessage();
       return;
     }
 
-    const baseAgg = (agg === 15) ? 20 : agg;
+    const baseAgg = (selectedAgg === 15) ? 20 : selectedAgg;
 
     const item = priceData.find(p =>
-      p.strength === strength &&
-      p.slump === slump &&
+      p.strength === selectedStrength &&
+      p.slump === selectedSlump &&
       p.agg === baseAgg
     );
 
@@ -376,11 +391,11 @@
     }
 
     let price = item.price;
-    if (agg === 15) {
+    if (selectedAgg === 15) {
       price += 500;
     }
 
-    const mixName = buildMixName(strength, slump, agg, cement);
+    const mixName = buildMixName(selectedStrength, selectedSlump, selectedAgg, selectedCement);
 
     resultEl.innerHTML = `
       <div class="label">検索結果</div>
@@ -392,25 +407,64 @@
     `;
   }
 
-  document.getElementById("aggButtons").addEventListener("click", (e) => {
-    if (e.target.tagName !== "BUTTON") return;
-    selectedAgg = Number(e.target.dataset.v);
-    setActiveButton("aggButtons", selectedAgg);
-    updateSlumpOptions();
-    slumpEl.value = "";
+  function refreshUI(){
+    setActiveButton(aggButtonsEl, selectedAgg);
+    setActiveButton(cementButtonsEl, selectedCement);
+    renderStrengthButtons();
+    renderSlumpButtons();
+    searchPrice();
+  }
+
+  strengthButtonsEl.addEventListener("click", (e) => {
+    if (e.target.tagName !== "BUTTON" || e.target.classList.contains("hidden")) return;
+
+    const newStrength = Number(e.target.dataset.v);
+    selectedStrength = newStrength;
+
+    const availableSlumps = getAvailableSlumps(selectedAgg, selectedStrength);
+    if (!availableSlumps.includes(selectedSlump)) {
+      if (availableSlumps.includes(8)) {
+        selectedSlump = 8;
+      } else {
+        selectedSlump = availableSlumps.length ? availableSlumps[0] : null;
+      }
+    }
+
+    renderStrengthButtons();
+    renderSlumpButtons();
     searchPrice();
   });
 
-  document.getElementById("cementButtons").addEventListener("click", (e) => {
+  slumpButtonsEl.addEventListener("click", (e) => {
+    if (e.target.tagName !== "BUTTON" || e.target.classList.contains("hidden")) return;
+
+    selectedSlump = Number(e.target.dataset.v);
+    renderSlumpButtons();
+    searchPrice();
+  });
+
+  aggButtonsEl.addEventListener("click", (e) => {
     if (e.target.tagName !== "BUTTON") return;
+
+    const newAgg = Number(e.target.dataset.v);
+    selectedAgg = newAgg;
+
+    if (!hasPrice(selectedStrength, selectedSlump, selectedAgg)) {
+      selectedStrength = 18;
+      selectedSlump = 8;
+    }
+
+    refreshUI();
+  });
+
+  cementButtonsEl.addEventListener("click", (e) => {
+    if (e.target.tagName !== "BUTTON") return;
+
     selectedCement = e.target.dataset.v;
-    setActiveButton("cementButtons", selectedCement);
+    setActiveButton(cementButtonsEl, selectedCement);
     searchPrice();
   });
 
-  strengthEl.addEventListener("change", searchPrice);
-  slumpEl.addEventListener("change", searchPrice);
-
-  renderDefaultMessage();
+  refreshUI();
 </script>
 {% endblock %}
