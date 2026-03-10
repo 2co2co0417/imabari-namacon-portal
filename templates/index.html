@@ -1,0 +1,68 @@
+{% extends "base_public.html" %}
+{% block title %}株式会社今治生コン｜取引先専用ページ（モック）{% endblock %}
+
+{% block content %}
+<section aria-label="公開トップページ（モック）">
+  <div class="grid">
+    <!-- 左：ログイン → ご注文要点 → お問い合わせ -->
+    <div class="card">
+      <div class="card-h">
+        <h1 class="hero-title">取引先専用ページ</h1>
+      </div>
+      <div class="card-b">
+
+        <div class="center">
+          <a class="btn-primary" href="{{ url_for('login') }}" aria-label="取引先様専用ログイン">
+            取引先様専用ログイン
+          </a>
+          <div class="muted" style="max-width: 560px; text-align:center;">
+            既存取引先様向けです。<br>
+            Webでの新規お取引受付は行っておりません。
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card inner-card">
+          <div class="card-h inner-h">
+            <h2>ご注文について（要点）</h2>
+          </div>
+          <div class="card-b">
+            <div class="muted">
+              以下が確定している場合のみ、出荷受付が可能です。<br>
+              ・生コンの配合　・数量　・配達場所　・希望日時
+            </div>
+            <div class="divider"></div>
+            <div class="muted">※用途相談・設計相談のみでの受付は行っておりません。</div>
+
+            <div style="margin-top:12px;">
+              <a class="btn-primary" href="{{ url_for('precheck') }}" aria-label="ご注文前確認事項（モック）">
+                ご注文前確認事項
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card inner-card">
+          <div class="card-h inner-h">
+            <h2>お問い合わせ</h2>
+          </div>
+          <div class="card-b">
+            <div class="muted">
+              ご注文以外の連絡は、お問い合わせフォームをご利用ください。
+            </div>
+            <div style="margin-top:12px;">
+              <a class="btn-primary" href="{{ url_for('contact') }}">お問い合わせフォーム</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {% include "_right_sidebar.html" %}
+  </div>
+</section>
+{% endblock %}

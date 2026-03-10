@@ -1,0 +1,416 @@
+{% extends "base_private.html" %}
+{% block title %}価格表｜取引先専用{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">価格表</h1>
+  </div>
+
+  <div class="card-b">
+    <div class="muted" style="margin-bottom:20px;">
+      配合検索で単価を確認できます。<br>
+      ※ 骨材15mmは20mm単価に +500円 / m³ です。<br>
+      ※ BB・H は現在 N 単価と同一表示です。
+    </div>
+
+    <!-- 配合検索 -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-h">
+        <h2 style="margin:0; font-size:1.1rem;">配合検索</h2>
+      </div>
+      <div class="card-b">
+
+        <div class="mix-search-grid">
+          <div>
+            <label for="strength" class="field-label">呼び強度</label>
+            <select id="strength" class="input-like">
+              <option value="">選択してください</option>
+              <option value="18">18</option>
+              <option value="21">21</option>
+              <option value="24">24</option>
+              <option value="27">27</option>
+              <option value="30">30</option>
+              <option value="33">33</option>
+              <option value="36">36</option>
+              <option value="40">40</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="slump" class="field-label">スランプ</label>
+            <select id="slump" class="input-like">
+              <option value="">選択してください</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div class="field-label" style="margin-bottom:8px;">骨材</div>
+          <div class="btn-group" id="aggButtons">
+            <button type="button" data-v="15">15mm</button>
+            <button type="button" data-v="20">20mm</button>
+            <button type="button" data-v="40">40mm</button>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div class="field-label" style="margin-bottom:8px;">セメント</div>
+          <div class="btn-group" id="cementButtons">
+            <button type="button" data-v="N">N</button>
+            <button type="button" data-v="BB">BB</button>
+            <button type="button" data-v="H">H</button>
+          </div>
+        </div>
+
+        <div id="priceResult" class="callout" style="margin-top:18px;">
+          <div class="label">検索結果</div>
+          <div class="muted" style="margin-top:6px;">
+            条件を選ぶと、ここに単価が表示されます。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- よく使う配合 -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-h">
+        <h2 style="margin:0; font-size:1.1rem;">よく使う配合</h2>
+      </div>
+      <div class="card-b">
+        <div style="overflow-x:auto;">
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>配合</th>
+                <th>単価</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>18-12-20N</td>
+                <td>23,100円 / m³</td>
+              </tr>
+              <tr>
+                <td>21-18-20N</td>
+                <td>23,900円 / m³</td>
+              </tr>
+              <tr>
+                <td>24-18-20N</td>
+                <td>24,300円 / m³</td>
+              </tr>
+              <tr>
+                <td>27-18-20N</td>
+                <td>24,700円 / m³</td>
+              </tr>
+              <tr>
+                <td>30-15-40N</td>
+                <td>24,500円 / m³</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDFダウンロード -->
+    <div class="card">
+      <div class="card-h">
+        <h2 style="margin:0; font-size:1.1rem;">PDFダウンロード</h2>
+      </div>
+      <div class="card-b">
+        <div class="actions" style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a class="btn-primary"
+             href="{{ url_for('static', filename='pdf/price_list_2026.pdf') }}"
+             target="_blank" rel="noopener">
+            単価表PDFを見る
+          </a>
+          <a class="btn-ghost"
+             href="{{ url_for('static', filename='pdf/price_list_2026.pdf') }}"
+             download>
+            単価表PDFをダウンロード
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .mix-search-grid{
+    display:grid;
+    gap:14px;
+    grid-template-columns:repeat(2, minmax(180px, 1fr));
+  }
+
+  .field-label{
+    display:block;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+
+  .input-like{
+    width:100%;
+    height:44px;
+    border:1px solid #d7e2de;
+    border-radius:10px;
+    padding:0 12px;
+    background:#fff;
+    font-size:15px;
+  }
+
+  .btn-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .btn-group button{
+    min-width:72px;
+    padding:10px 16px;
+    border-radius:10px;
+    border:1px solid #d6e0dc;
+    background:#fff;
+    cursor:pointer;
+    font-weight:700;
+  }
+
+  .btn-group button.active{
+    background:#2f9488;
+    color:#fff;
+    border-color:#2f9488;
+  }
+
+  .price-box{
+    display:grid;
+    gap:8px;
+  }
+
+  .price-main{
+    font-size:1.7rem;
+    font-weight:800;
+    color:#173b36;
+  }
+
+  .price-sub{
+    font-size:0.95rem;
+    color:#5b6b67;
+  }
+
+  .simple-table{
+    width:100%;
+    border-collapse:collapse;
+  }
+
+  .simple-table th,
+  .simple-table td{
+    padding:10px;
+    border-bottom:1px solid #e6ece9;
+    text-align:left;
+    white-space:nowrap;
+  }
+
+  @media (max-width: 640px){
+    .mix-search-grid{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+
+<script>
+  const priceData = [
+    {strength:18, slump:8,  agg:20, price:23000},
+    {strength:18, slump:12, agg:20, price:23100},
+    {strength:18, slump:15, agg:20, price:23300},
+    {strength:18, slump:18, agg:20, price:23500},
+
+    {strength:21, slump:8,  agg:20, price:23300},
+    {strength:21, slump:12, agg:20, price:23500},
+    {strength:21, slump:15, agg:20, price:23700},
+    {strength:21, slump:18, agg:20, price:23900},
+    {strength:21, slump:21, agg:20, price:25200},
+
+    {strength:24, slump:8,  agg:20, price:23600},
+    {strength:24, slump:12, agg:20, price:23800},
+    {strength:24, slump:15, agg:20, price:24000},
+    {strength:24, slump:18, agg:20, price:24300},
+    {strength:24, slump:21, agg:20, price:25600},
+
+    {strength:27, slump:8,  agg:20, price:24000},
+    {strength:27, slump:12, agg:20, price:24200},
+    {strength:27, slump:15, agg:20, price:24400},
+    {strength:27, slump:18, agg:20, price:24700},
+    {strength:27, slump:21, agg:20, price:26100},
+
+    {strength:30, slump:8,  agg:20, price:24300},
+    {strength:30, slump:12, agg:20, price:24600},
+    {strength:30, slump:15, agg:20, price:24800},
+    {strength:30, slump:18, agg:20, price:25100},
+    {strength:30, slump:21, agg:20, price:26500},
+
+    {strength:33, slump:8,  agg:20, price:25000},
+    {strength:33, slump:12, agg:20, price:25000},
+    {strength:33, slump:15, agg:20, price:25200},
+    {strength:33, slump:18, agg:20, price:25500},
+    {strength:33, slump:21, agg:20, price:26900},
+
+    {strength:36, slump:8,  agg:20, price:25000},
+    {strength:36, slump:12, agg:20, price:25200},
+    {strength:36, slump:15, agg:20, price:25400},
+    {strength:36, slump:18, agg:20, price:25600},
+    {strength:36, slump:21, agg:20, price:26800},
+
+    {strength:40, slump:8,  agg:20, price:25800},
+    {strength:40, slump:12, agg:20, price:25800},
+    {strength:40, slump:15, agg:20, price:26100},
+    {strength:40, slump:18, agg:20, price:27900},
+
+    {strength:18, slump:5,  agg:40, price:22600},
+    {strength:18, slump:8,  agg:40, price:22800},
+    {strength:18, slump:12, agg:40, price:22900},
+    {strength:18, slump:15, agg:40, price:23100},
+
+    {strength:21, slump:5,  agg:40, price:22900},
+    {strength:21, slump:8,  agg:40, price:23100},
+    {strength:21, slump:12, agg:40, price:23300},
+    {strength:21, slump:15, agg:40, price:23500},
+
+    {strength:24, slump:5,  agg:40, price:23200},
+    {strength:24, slump:8,  agg:40, price:23400},
+    {strength:24, slump:12, agg:40, price:23600},
+    {strength:24, slump:15, agg:40, price:23800},
+
+    {strength:27, slump:5,  agg:40, price:23600},
+    {strength:27, slump:8,  agg:40, price:23900},
+    {strength:27, slump:12, agg:40, price:24200},
+    {strength:27, slump:15, agg:40, price:24300},
+
+    {strength:30, slump:8,  agg:40, price:24000},
+    {strength:30, slump:12, agg:40, price:24300},
+    {strength:30, slump:15, agg:40, price:24500}
+  ];
+
+  const slumpOptions = {
+    15: [8, 12, 15, 18, 21],
+    20: [8, 12, 15, 18, 21],
+    40: [5, 8, 12, 15]
+  };
+
+  const strengthEl = document.getElementById("strength");
+  const slumpEl = document.getElementById("slump");
+  const resultEl = document.getElementById("priceResult");
+
+  let selectedAgg = null;
+  let selectedCement = null;
+
+  function formatYen(value){
+    return value.toLocaleString("ja-JP") + "円 / m³";
+  }
+
+  function buildMixName(strength, slump, agg, cement){
+    return `${strength}-${slump}-${agg}${cement}`;
+  }
+
+  function updateSlumpOptions(){
+    const list = slumpOptions[selectedAgg] || [];
+    const current = slumpEl.value;
+
+    slumpEl.innerHTML = '<option value="">選択してください</option>';
+
+    list.forEach(v => {
+      const op = document.createElement("option");
+      op.value = v;
+      op.textContent = v;
+      slumpEl.appendChild(op);
+    });
+
+    if (list.includes(Number(current))) {
+      slumpEl.value = current;
+    }
+  }
+
+  function setActiveButton(containerId, value){
+    const container = document.getElementById(containerId);
+    container.querySelectorAll("button").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.v === String(value));
+    });
+  }
+
+  function renderDefaultMessage(){
+    resultEl.innerHTML = `
+      <div class="label">検索結果</div>
+      <div class="muted" style="margin-top:6px;">
+        条件を選ぶと、ここに単価が表示されます。
+      </div>
+    `;
+  }
+
+  function searchPrice(){
+    const strength = Number(strengthEl.value);
+    const slump = Number(slumpEl.value);
+    const agg = Number(selectedAgg);
+    const cement = selectedCement;
+
+    if (!strength || !slump || !agg || !cement){
+      renderDefaultMessage();
+      return;
+    }
+
+    const baseAgg = (agg === 15) ? 20 : agg;
+
+    const item = priceData.find(p =>
+      p.strength === strength &&
+      p.slump === slump &&
+      p.agg === baseAgg
+    );
+
+    if (!item){
+      resultEl.innerHTML = `
+        <div class="label">検索結果</div>
+        <div class="muted" style="margin-top:6px;">
+          該当する単価がありません。条件をご確認ください。
+        </div>
+      `;
+      return;
+    }
+
+    let price = item.price;
+    if (agg === 15) {
+      price += 500;
+    }
+
+    const mixName = buildMixName(strength, slump, agg, cement);
+
+    resultEl.innerHTML = `
+      <div class="label">検索結果</div>
+      <div class="price-box" style="margin-top:10px;">
+        <div><strong>配合</strong>：${mixName}</div>
+        <div class="price-main">${formatYen(price)}</div>
+        <div class="price-sub">※ BB・H は現在 N と同一単価です。</div>
+      </div>
+    `;
+  }
+
+  document.getElementById("aggButtons").addEventListener("click", (e) => {
+    if (e.target.tagName !== "BUTTON") return;
+    selectedAgg = Number(e.target.dataset.v);
+    setActiveButton("aggButtons", selectedAgg);
+    updateSlumpOptions();
+    slumpEl.value = "";
+    searchPrice();
+  });
+
+  document.getElementById("cementButtons").addEventListener("click", (e) => {
+    if (e.target.tagName !== "BUTTON") return;
+    selectedCement = e.target.dataset.v;
+    setActiveButton("cementButtons", selectedCement);
+    searchPrice();
+  });
+
+  strengthEl.addEventListener("change", searchPrice);
+  slumpEl.addEventListener("change", searchPrice);
+
+  renderDefaultMessage();
+</script>
+{% endblock %}

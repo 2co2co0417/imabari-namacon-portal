@@ -1,0 +1,35 @@
+{% extends "base_private.html" %}
+{% block title %}業務メニュー｜取引先専用{% endblock %}
+
+{% block content %}
+<section aria-label="ログイン後">
+  <div class="dashboard-grid">
+    <div class="card main-card">
+      <div class="card-h">
+        <h1 class="hero-title">業務メニュー</h1>
+      </div>
+
+      <div class="card-b">
+        <div>
+          {{ session.get("user", {}).get("company", "") }}
+          {{ session.get("user", {}).get("name", "") }}
+        </div>
+
+        <div class="callout">
+          <div class="label">☎ ご注文専用電話</div>
+          <div class="phone">{{ order_phone }}</div>
+          <div class="muted" style="margin-top:8px;">※モックのため番号は仮です。</div>
+        </div>
+
+        <div class="actions">
+          <a class="btn-primary" href="{{ url_for('map_send') }}">現場地図を送る</a>
+          <a class="btn-primary" href="{{ url_for('mix_report') }}">配合報告書を依頼</a>
+          <a class="btn-primary" href="{{ url_for('price') }}">価格表を見る</a>
+        </div>
+      </div>
+    </div>
+
+    {% include "_right_sidebar.html" %}
+  </div>
+</section>
+{% endblock %}

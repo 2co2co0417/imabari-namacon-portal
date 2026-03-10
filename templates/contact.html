@@ -1,0 +1,69 @@
+{% extends "base_public.html" %}
+{% block title %}お問い合わせ｜株式会社今治生コン{% endblock %}
+
+{% block content %}
+<div class="card">
+
+  <div class="card-h">
+    <h1 class="hero-title">お問い合わせ</h1>
+  </div>
+
+  <div class="card-b" style="max-width:720px; margin: 0 auto;">
+
+    <form method="post" class="form">
+
+      <!-- 会社名 -->
+      <label class="label">会社名</label>
+      <input
+        class="input"
+        type="text"
+        name="company"
+        placeholder="例：○○建設株式会社"
+        required
+      >
+
+      <!-- お名前 -->
+      <label class="label" style="margin-top:12px;">お名前</label>
+      <input
+        class="input"
+        type="text"
+        name="name"
+        placeholder="例：田中 太郎"
+        required
+      >
+
+      <!-- メールアドレス -->
+      <label class="label" style="margin-top:12px;">メールアドレス</label>
+      <input
+        class="input"
+        type="email"
+        name="email"
+        placeholder="例：tanaka@example.co.jp"
+        required
+      >
+
+      <!-- お問い合わせ内容 -->
+      <label class="label" style="margin-top:12px;">お問い合わせ内容</label>
+      <textarea
+        class="textarea"
+        name="message"
+        rows="6"
+        placeholder="お問い合わせ内容をご記入ください"
+        required
+      ></textarea>
+
+      <!-- 送信ボタン -->
+      <div style="margin-top:14px;">
+        <button class="btn-primary" type="submit">送信</button>
+      </div>
+
+    </form>
+
+    <div class="muted" style="margin-top:12px;">
+      ※現在はモック画面です。後日、迷惑送信対策と受付通知を追加します。
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

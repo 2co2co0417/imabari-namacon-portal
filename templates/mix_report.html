@@ -1,0 +1,30 @@
+{% extends "base_private.html" %}
+{% block title %}配合報告書を依頼｜取引先専用{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">配合報告書を依頼</h1>
+  </div>
+  <div class="card-b" style="max-width:720px; margin: 0 auto;">
+    <form method="post" class="form">
+      <label class="label">工事名</label>
+      <input class="input" name="project" placeholder="例：○○橋梁補修工事">
+
+      <label class="label" style="margin-top:12px;">配合番号（分かれば）</label>
+      <input class="input" name="mix_no" placeholder="例：24-12-20N">
+
+      <label class="label" style="margin-top:12px;">必要日（任意）</label>
+      <input class="input" name="date_needed" placeholder="例：2026-03-15">
+
+      <label class="label" style="margin-top:12px;">備考（任意）</label>
+      <textarea class="textarea" name="note" rows="4" placeholder="提出先、様式指定など"></textarea>
+
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-primary" type="submit">依頼（モック）</button>
+        <a class="btn-ghost" href="{{ url_for('dashboard') }}">戻る</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

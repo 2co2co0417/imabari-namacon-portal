@@ -1,0 +1,32 @@
+{% extends "base_public.html" %}
+{% block title %}ログイン｜株式会社今治生コン{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">取引先様ログイン</h1>
+  </div>
+
+  <div class="card-b" style="max-width:520px; margin: 0 auto;">
+    <form method="post" class="form">
+      <label class="label">ログインID</label>
+      <input
+        class="input"
+        name="phone"
+        placeholder="登録済みIDを入力"
+        inputmode="numeric"
+        autocomplete="username"
+        required
+      >
+
+      <div style="margin-top:14px;">
+        <button class="btn-primary" type="submit">ログイン</button>
+      </div>
+
+      <div class="muted" style="margin-top:10px;">
+        ※取引開始時にお渡しした登録IDをご入力ください。
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base_private.html" %}
+{% block title %}お知らせ｜取引先専用{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">{{ item.title }}</h1>
+  </div>
+  <div class="card-b">
+    <div class="muted">掲載日：{{ item.date }}</div>
+    <div class="divider"></div>
+    <div style="white-space:pre-wrap; line-height:1.8;">{{ item.body }}</div>
+
+    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+      <a class="btn-ghost" href="{{ url_for('news_list') }}">一覧へ</a>
+      <a class="btn-ghost" href="{{ url_for('dashboard') }}">業務メニューへ</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+<aside class="side side-panel" aria-label="お知らせ・営業案内・各種情報">
+  <div class="card">
+    <div class="card-h">
+      <h2>お知らせ</h2>
+    </div>
+    <div class="card-b">
+      {% if news %}
+        <div class="notice">
+          <ul>
+            {% for n in news[:3] %}
+              <li>
+                <a href="{{ url_for('news_detail', news_id=n.id) }}">{{ n.title }}</a>
+                <span class="date">{{ n.date }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="muted">現在お知らせはありません。</div>
+      {% endif %}
+
+      <div style="margin-top:12px;">
+        <a class="btn-ghost" href="{{ url_for('news_list') }}">お知らせ一覧</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-b" style="display:grid; gap:12px;">
+      <details class="acc">
+        <summary>
+          <h2>営業案内</h2><span class="caret">›</span>
+        </summary>
+        <div class="acc-b">
+          <div class="muted">
+            営業時間：7:50～16:30<br>
+            当日のご注文は15:30までにお願いします。
+            休業日：土曜・日曜<br>
+            　　　　GW・お盆・年末年始
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>
+          <h2>配達エリア</h2><span class="caret">›</span>
+        </summary>
+        <div class="acc-b">
+          <div class="muted">
+            今治市内（島しょ部は配達エリア外）
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>
+          <h2>車両サイズ</h2><span class="caret">›</span>
+        </summary>
+        <div class="acc-b">
+          <table style="width:100%; border-collapse:collapse; font-size:14px;">
+            <thead>
+              <tr style="border-bottom:1px solid #ddd;">
+                <th style="text-align:left; padding:6px;">車両</th>
+                <th style="text-align:left; padding:6px;">車幅</th>
+                <th style="text-align:left; padding:6px;">車高</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:6px;">2t車</td>
+                <td style="padding:6px;">約1.70m</td>
+                <td style="padding:6px;">約2.75m</td>
+              </tr>
+              <tr>
+                <td style="padding:6px;">4t車</td>
+                <td style="padding:6px;">約2.17m</td>
+                <td style="padding:6px;">約3.15m</td>
+              </tr>
+              <tr>
+                <td style="padding:6px;">5t車</td>
+                <td style="padding:6px;">約2.30m</td>
+                <td style="padding:6px;">約3.25m</td>
+              </tr>
+              <tr>
+                <td style="padding:6px;">10t車</td>
+                <td style="padding:6px;">約2.50m</td>
+                <td style="padding:6px;">約3.75m</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="muted" style="margin-top:10px;">
+            ※数値は目安です。車両により若干異なる場合があります。
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>
+          <h2>採用情報（予定）</h2><span class="caret" aria-hidden="true">›</span>
+        </summary>
+        <div class="acc-b">
+          <div class="muted">（準備中）公開予定です。</div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>
+          <h2>会社案内（予定）</h2><span class="caret" aria-hidden="true">›</span>
+        </summary>
+        <div class="acc-b">
+          <div class="muted">（準備中）公開予定です。</div>
+        </div>
+      </details>
+    </div>
+  </div>
+</aside>

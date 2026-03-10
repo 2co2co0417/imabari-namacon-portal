@@ -1,0 +1,31 @@
+{% extends "base_private.html" %}
+{% block title %}現場地図を送る｜取引先専用{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">現場地図を送る</h1>
+  </div>
+  <div class="card-b" style="max-width:720px; margin: 0 auto;">
+    <form method="post" class="form">
+      <label class="label">現場名</label>
+      <input class="input" name="site_name" placeholder="例：○○マンション新築工事">
+
+      <label class="label" style="margin-top:12px;">GoogleマップURL（または住所）</label>
+      <input class="input" name="map_url" placeholder="https://maps.app.goo.gl/...  または 住所">
+
+      <label class="label" style="margin-top:12px;">補足（任意）</label>
+      <textarea class="textarea" name="note" rows="4" placeholder="進入路の注意、集合場所など"></textarea>
+
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-primary" type="submit">送信（モック）</button>
+        <a class="btn-ghost" href="{{ url_for('dashboard') }}">戻る</a>
+      </div>
+    </form>
+
+    <div class="muted" style="margin-top:12px;">
+      ※本番では、送信先（今治生コン側）にメール送付＋履歴保存を行います。
+    </div>
+  </div>
+</div>
+{% endblock %}

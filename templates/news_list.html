@@ -1,0 +1,23 @@
+{% extends "base_private.html" %}
+{% block title %}お知らせ一覧｜取引先専用{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">お知らせ一覧</h1>
+  </div>
+  <div class="card-b">
+    <ul class="news-list">
+      {% for n in news %}
+        <li>
+          <a href="{{ url_for('news_detail', news_id=n.id) }}">{{ n.title }}</a>
+          <span class="date">{{ n.date }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <div style="margin-top:12px;">
+      <a class="btn-ghost" href="{{ url_for('dashboard') }}">業務メニューへ</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
