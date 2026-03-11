@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, date
 from db import get_db, close_db, init_db
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,8 +27,23 @@ app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USERNAME"] = MAIL_USERNAME
 app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = MAIL_USERNAME
+app.config["UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "uploads")
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10MBまで
+
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 mail = Mail(app)
+
+MIX_OPTIONS = [
+    "24-8-20BB", "24-8-40BB", "24-12-20BB", "30-18-20BB",
+    "18-18-20N", "21-15-20N", "24-15-20N", "27-15-20N", "27-18-20N", "30-18-20N"
+]
+
+
+def allowed_image(filename):
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    return ext in {"jpg", "jpeg", "png", "heic", "webp"}
+
 
 print("BASE_DIR =", BASE_DIR)
 print(".env exists =", os.path.exists(os.path.join(BASE_DIR, ".env")))
@@ -60,6 +76,7 @@ def add_no_cache_headers(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
+
 
 # --- モック：ログイン用（本番はDB/取引先マスタに置き換え） ---
 DEMO_USER = {
@@ -228,9 +245,11 @@ def logout():
     session.pop("user", None)
     return redirect(url_for("index"))
 
+
 @app.route("/precheck")
 def precheck():
     return render_template("precheck.html")
+
 
 # --- 取引先専用 ---
 @app.route("/dashboard")
@@ -260,19 +279,128 @@ def map_send():
 @app.route("/mix-report", methods=["GET", "POST"])
 @login_required
 def mix_report():
-    if request.method == "POST":
-        # 本番：依頼内容→受付→担当へ通知、履歴保存
-        project = request.form.get("project", "").strip()
-        mix_no = request.form.get("mix_no", "").strip()
-        date_needed = request.form.get("date_needed", "").strip()
-
-        flash(
-            f"（モック）配合報告書の依頼を受け付けました：{project if project else '工事名未入力'}",
-            "ok"
+    if request.method == "GET":
+        return render_template(
+            "mix_report.html",
+            today=date.today().isoformat(),
+            mix_options=MIX_OPTIONS
         )
-        return redirect(url_for("mix_report"))
 
-    return render_template("mix_report.html")
+    project = request.form.get("project", "").strip()
+    report_date = request.form.get("report_date", "").strip()
+    copies = request.form.get("copies", "2").strip()
+    selected_mixes = request.form.getlist("mixes")
+    custom_mix = request.form.get("custom_mix", "").strip()
+    note = request.form.get("note", "").strip()
+    photo = request.files.get("photo")
+
+    if not report_date:
+        report_date = date.today().isoformat()
+
+    if not copies:
+        copies = "2"
+
+    if not photo or photo.filename == "":
+        flash("工事番号・工事名が写った写真を添付してください。", "error")
+        return render_template(
+            "mix_report.html",
+            today=report_date,
+            mix_options=MIX_OPTIONS
+        )
+
+    if not allowed_image(photo.filename):
+        flash("写真は JPG / JPEG / PNG / HEIC / WEBP を使用してください。", "error")
+        return render_template(
+            "mix_report.html",
+            today=report_date,
+            mix_options=MIX_OPTIONS
+        )
+
+    all_mixes = []
+    for m in selected_mixes:
+        m = m.strip()
+        if m:
+            all_mixes.append(m)
+
+    if custom_mix:
+        custom_list = [x.strip() for x in custom_mix.replace("、", ",").split(",") if x.strip()]
+        all_mixes.extend(custom_list)
+
+    # 重複除去（順番維持）
+    unique_mixes = []
+    seen = set()
+    for m in all_mixes:
+        if m not in seen:
+            unique_mixes.append(m)
+            seen.add(m)
+
+    if not unique_mixes:
+        flash("配合を1つ以上選択、または直接入力してください。", "error")
+        return render_template(
+            "mix_report.html",
+            today=report_date,
+            mix_options=MIX_OPTIONS
+        )
+
+    filename = secure_filename(photo.filename)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_name = f"{timestamp}_{filename}"
+    save_path = os.path.join(app.config["UPLOAD_FOLDER"], save_name)
+    photo.save(save_path)
+
+    user = session.get("user", {})
+    company = user.get("company", "")
+    name = user.get("name", "")
+
+    subject = f"配合報告書依頼｜{project or '工事名未入力'}"
+    body = f"""配合報告書の依頼がありました。
+
+【依頼者】
+会社名：{company}
+氏名：{name}
+
+【工事名】
+{project or '未入力'}
+
+【配合報告書の日付】
+{report_date}
+
+【部数】
+{copies}部
+
+【配合】
+{", ".join(unique_mixes)}
+
+【備考】
+{note or 'なし'}
+"""
+
+    try:
+        msg = Message(
+            subject=subject,
+            recipients=[MAIL_TO],
+            body=body
+        )
+
+        with app.open_resource(save_path) as fp:
+            msg.attach(
+                filename=save_name,
+                content_type=photo.content_type or "application/octet-stream",
+                data=fp.read()
+            )
+
+        mail.send(msg)
+        flash("配合報告書の依頼を送信しました。", "success")
+        return redirect(url_for("dashboard"))
+
+    except Exception as e:
+        print("mix_report send error:", e)
+        flash("送信に失敗しました。メール設定をご確認ください。", "error")
+        return render_template(
+            "mix_report.html",
+            today=report_date,
+            mix_options=MIX_OPTIONS
+        )
 
 
 @app.route("/price")

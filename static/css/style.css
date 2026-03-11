@@ -419,3 +419,265 @@ footer{
     grid-template-columns: 1fr;
   }
 }
+/* =======================================
+   価格表の配合検索ボタンをスマホで1列表示
+   ======================================= */
+@media (max-width: 768px){
+
+  #strengthButtons,
+  #slumpButtons{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  #strengthButtons button,
+  #slumpButtons button{
+    min-width: 0;
+    flex: 1 1 0;
+    padding: 10px 0;
+    font-size: 0.9rem;
+  }
+}
+/* =========================
+   配合報告書依頼（スマホ優先）
+========================= */
+.mobile-form{
+  display:grid;
+  gap:0;
+}
+
+.form-help{
+  margin-top:6px;
+  font-size:13px;
+}
+
+.mix-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.mix-chip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  border:1px solid var(--gray-200);
+  border-radius:12px;
+  background:#fff;
+  min-height:52px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.mix-chip input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  margin:0;
+  flex:0 0 auto;
+}
+
+.mix-chip span{
+  font-weight:700;
+  color:var(--dark-700);
+  line-height:1.35;
+  word-break:break-word;
+}
+
+.mobile-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.btn-large{
+  min-height:48px;
+  padding:12px 20px;
+  font-size:16px;
+}
+
+/* スマホ最適化 */
+@media (max-width: 768px){
+  .card-b{
+    padding:16px !important;
+  }
+
+  .mix-grid{
+    grid-template-columns:1fr;
+  }
+
+  .input,
+  .textarea,
+  .btn-primary,
+  .btn-ghost{
+    width:100%;
+  }
+
+  .mobile-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .mix-chip{
+    min-height:56px;
+    padding:14px;
+  }
+
+  .mix-chip span{
+    font-size:15px;
+  }
+}
+/* =========================
+   配合報告書依頼（スマホ優先）
+========================= */
+.mobile-form{
+  display:grid;
+  gap:0;
+}
+
+.form-help{
+  margin-top:6px;
+  font-size:13px;
+}
+
+/* 部数ステッパー */
+.stepper{
+  display:grid;
+  grid-template-columns:56px 1fr 56px;
+  gap:8px;
+  align-items:center;
+  margin-top:8px;
+}
+
+.stepper-btn{
+  height:48px;
+  border:1px solid var(--gray-200);
+  border-radius:12px;
+  background:#fff;
+  font-size:24px;
+  font-weight:700;
+  color:var(--dark-700);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+}
+
+.stepper-btn:active{
+  transform:translateY(1px);
+}
+
+.stepper-input{
+  height:48px;
+  border:1px solid var(--gray-200);
+  border-radius:12px;
+  background:#fff;
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+  color:var(--dark-700);
+  width:100%;
+  padding:0 12px;
+}
+
+/* 配合ボタン */
+.mix-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.mix-chip{
+  position:relative;
+  display:block;
+  cursor:pointer;
+}
+
+.mix-chip input[type="checkbox"]{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.mix-chip span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  min-height:52px;
+  padding:12px 14px;
+  border:1px solid var(--gray-200);
+  border-radius:12px;
+  background:#fff;
+  color:var(--dark-700);
+  font-weight:700;
+  line-height:1.35;
+  word-break:break-word;
+  transition:all .15s ease;
+  user-select:none;
+  box-shadow:0 2px 6px rgba(16,24,40,.04);
+}
+
+.mix-chip input[type="checkbox"]:checked + span{
+  background:var(--mint-500);
+  border-color:var(--mint-500);
+  color:#fff;
+  box-shadow:0 8px 18px rgba(59,170,156,.22);
+}
+
+.mix-chip span:active{
+  transform:translateY(1px);
+}
+
+.mobile-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.btn-large{
+  min-height:48px;
+  padding:12px 20px;
+  font-size:16px;
+}
+
+/* スマホ最適化 */
+@media (max-width: 768px){
+  .card-b{
+    padding:16px !important;
+  }
+
+  .mix-grid{
+    grid-template-columns:1fr;
+  }
+
+  .input,
+  .textarea,
+  .btn-primary,
+  .btn-ghost{
+    width:100%;
+  }
+
+  .mobile-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .mix-chip span{
+    min-height:56px;
+    padding:14px;
+    font-size:15px;
+  }
+
+  .stepper{
+    grid-template-columns:52px 1fr 52px;
+  }
+
+  .stepper-btn,
+  .stepper-input{
+    height:50px;
+  }
+}

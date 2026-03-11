@@ -6,25 +6,132 @@
   <div class="card-h">
     <h1 class="hero-title">配合報告書を依頼</h1>
   </div>
-  <div class="card-b" style="max-width:720px; margin: 0 auto;">
-    <form method="post" class="form">
-      <label class="label">工事名</label>
-      <input class="input" name="project" placeholder="例：○○橋梁補修工事">
 
-      <label class="label" style="margin-top:12px;">配合番号（分かれば）</label>
-      <input class="input" name="mix_no" placeholder="例：24-12-20N">
+  <div class="card-b" style="max-width:760px; margin:0 auto;">
+    <div class="callout" style="margin-bottom:16px;">
+      <div class="label">スマホ用入力</div>
+      <div class="muted" style="margin-top:6px;">
+        契約書の工事番号・工事名が写るように撮影して、そのまま送信してください。
+      </div>
+    </div>
 
-      <label class="label" style="margin-top:12px;">必要日（任意）</label>
-      <input class="input" name="date_needed" placeholder="例：2026-03-15">
+    <form method="post" enctype="multipart/form-data" class="form mobile-form">
+      <!-- 写真 -->
+      <label class="label" for="photo">契約書の写真 <span style="color:#b42318;">*</span></label>
+      <input
+        id="photo"
+        class="input"
+        type="file"
+        name="photo"
+        accept="image/*"
+        capture="environment"
+        required
+      >
+      <div class="muted form-help">
+        スマホではカメラ起動、または写真選択ができます。
+      </div>
 
-      <label class="label" style="margin-top:12px;">備考（任意）</label>
-      <textarea class="textarea" name="note" rows="4" placeholder="提出先、様式指定など"></textarea>
+      <!-- 日付 -->
+      <label class="label" for="report_date" style="margin-top:14px;">配合報告書の日付</label>
+      <input
+        id="report_date"
+        class="input"
+        type="date"
+        name="report_date"
+        value="{{ today }}"
+      >
 
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-primary" type="submit">依頼（モック）</button>
+      <!-- 部数 -->
+      <label class="label" for="copies" style="margin-top:14px;">部数</label>
+      <div class="stepper" aria-label="部数の増減">
+        <button type="button" class="stepper-btn" id="copies-minus" aria-label="部数を減らす">−</button>
+        <input
+          id="copies"
+          class="stepper-input"
+          type="number"
+          name="copies"
+          min="1"
+          step="1"
+          value="2"
+          inputmode="numeric"
+          readonly
+        >
+        <button type="button" class="stepper-btn" id="copies-plus" aria-label="部数を増やす">＋</button>
+      </div>
+      <div class="muted form-help">
+        タップで部数を変更できます。
+      </div>
+
+      <!-- 工事名 -->
+      <label class="label" for="project" style="margin-top:14px;">工事名（任意）</label>
+      <input
+        id="project"
+        class="input"
+        name="project"
+        placeholder="例：○○橋梁補修工事"
+      >
+      <div class="muted form-help">
+        写真に写っていれば未入力でも運用可能です。
+      </div>
+
+      <!-- 配合候補 -->
+      <label class="label" style="margin-top:18px;">配合（複数選択可）</label>
+      <div class="mix-grid">
+        {% for mix in mix_options %}
+          <label class="mix-chip">
+            <input type="checkbox" name="mixes" value="{{ mix }}">
+            <span>{{ mix }}</span>
+          </label>
+        {% endfor %}
+      </div>
+
+      <!-- 直接入力 -->
+      <label class="label" for="custom_mix" style="margin-top:16px;">その他の配合（直接入力）</label>
+      <input
+        id="custom_mix"
+        class="input"
+        name="custom_mix"
+        placeholder="例：24-12-20N, 27-18-40BB"
+      >
+      <div class="muted form-help">
+        複数ある場合はカンマ「,」または読点「、」で区切ってください。
+      </div>
+
+      <!-- 備考 -->
+      <label class="label" for="note" style="margin-top:14px;">備考（任意）</label>
+      <textarea
+        id="note"
+        class="textarea"
+        name="note"
+        rows="4"
+        placeholder="提出先、様式指定など"
+      ></textarea>
+
+      <div class="mobile-actions">
+        <button class="btn-primary btn-large" type="submit">送信する</button>
         <a class="btn-ghost" href="{{ url_for('dashboard') }}">戻る</a>
       </div>
     </form>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const copiesInput = document.getElementById("copies");
+  const minusBtn = document.getElementById("copies-minus");
+  const plusBtn = document.getElementById("copies-plus");
+
+  minusBtn.addEventListener("click", function () {
+    let value = parseInt(copiesInput.value || "2", 10);
+    value = Math.max(1, value - 1);
+    copiesInput.value = value;
+  });
+
+  plusBtn.addEventListener("click", function () {
+    let value = parseInt(copiesInput.value || "2", 10);
+    value = value + 1;
+    copiesInput.value = value;
+  });
+});
+</script>
 {% endblock %}
