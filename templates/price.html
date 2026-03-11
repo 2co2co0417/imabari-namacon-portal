@@ -8,11 +8,7 @@
   </div>
 
   <div class="card-b">
-    <div class="muted" style="margin-bottom:20px;">
-      配合検索で単価を確認できます。<br>
-      ※ 骨材15mmは20mm単価に +500円 / m³ です。<br>
-      ※ BB・H は現在 N 単価と同一表示です。
-    </div>
+    <div class="muted" style="margin-bottom:20px;"></div>
 
     <!-- 配合検索 -->
     <div class="card" style="margin-bottom:20px;">
@@ -74,49 +70,76 @@
             </thead>
             <tbody>
               <tr>
-                <td>18-12-20N</td>
-                <td>23,100円 / m³</td>
+                <td>18-15-20N</td>
+                <td>23,300円 / m³</td>
               </tr>
               <tr>
-                <td>21-18-20N</td>
-                <td>23,900円 / m³</td>
+                <td>24-15-20N</td>
+                <td>24,000円 / m³</td>
               </tr>
               <tr>
-                <td>24-18-20N</td>
-                <td>24,300円 / m³</td>
+                <td>27-15-20N</td>
+                <td>24,400円 / m³</td>
               </tr>
               <tr>
-                <td>27-18-20N</td>
-                <td>24,700円 / m³</td>
+                <td>24-8-20BB</td>
+                <td>23,600円 / m³</td>
               </tr>
               <tr>
-                <td>30-15-40N</td>
-                <td>24,500円 / m³</td>
+                <td>24-8-40BB</td>
+                <td>23,400円 / m³</td>
               </tr>
-            </tbody>
+            </tbody> 
           </table>
         </div>
       </div>
     </div>
 
-    <!-- PDFダウンロード -->
-    <div class="card">
+    <!-- PDF単価表 -->
+    <div class="card" style="margin-bottom:20px;">
       <div class="card-h">
-        <h2 style="margin:0; font-size:1.1rem;">PDFダウンロード</h2>
+        <h2 style="margin:0; font-size:1.1rem;">PDF単価表</h2>
       </div>
       <div class="card-b">
-        <div class="actions" style="display:flex; gap:12px; flex-wrap:wrap;">
-          <a class="btn-primary"
-             href="{{ url_for('static', filename='pdf/price_list_2026.pdf') }}"
-             target="_blank" rel="noopener">
-            単価表PDFを見る
-          </a>
-          <a class="btn-ghost"
-             href="{{ url_for('static', filename='pdf/price_list_2026.pdf') }}"
-             download>
-            単価表PDFをダウンロード
+
+        <div class="muted" style="margin-bottom:14px;">
+          PDF種類を選択して「表示」を押してください。
+        </div>
+
+        <div class="actions pdf-actions">
+          <button type="button" id="btnNormalPdf" class="btn-primary">
+            単価表
+          </button>
+
+          <button type="button" id="btnEarlyPdf" class="btn-ghost">
+            早強単価表
+          </button>
+
+          <button type="button" id="btnShowPdf" class="btn-primary">
+            表示
+          </button>
+
+          <a
+            id="btnDownloadPdf"
+            class="btn-ghost"
+            href="{{ url_for('static', filename='pdf/price_list_2026.pdf') }}"
+            download>
+            ダウンロード
           </a>
         </div>
+
+        <div id="selectedPdfLabel" class="pdf-current-label">
+          選択中：単価表
+        </div>
+
+        <div id="pdfViewerWrap" class="pdf-viewer-wrap" style="display:none;">
+          <iframe
+            id="pdfViewer"
+            class="pdf-viewer"
+            src="">
+          </iframe>
+        </div>
+
       </div>
     </div>
 
@@ -185,10 +208,44 @@
     text-align:left;
     white-space:nowrap;
   }
+
+  .pdf-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+
+  .pdf-current-label{
+    margin-bottom:10px;
+    font-weight:700;
+    color:#173b36;
+  }
+
+  .pdf-viewer-wrap{
+    width:100%;
+    height:80vh;
+    border:1px solid #d6e0dc;
+    border-radius:12px;
+    overflow:hidden;
+    background:#f8fbfa;
+  }
+
+  .pdf-viewer{
+    width:100%;
+    height:100%;
+    border:none;
+  }
+
+  @media (max-width:768px){
+    .pdf-viewer-wrap{
+      height:65vh;
+    }
+  }
 </style>
 
 <script>
-  const priceData = [
+  const normalPriceData = [
     /* 20mm */
     {strength:18, slump:8,  agg:20, price:23000},
     {strength:18, slump:12, agg:20, price:23100},
@@ -241,6 +298,58 @@
     {strength:30, slump:15, agg:40, price:24500}
   ];
 
+  const earlyPriceData = [
+    /* 20mm 早強 */
+    {strength:18, slump:8,  agg:20, price:24300},
+    {strength:18, slump:12, agg:20, price:24500},
+    {strength:18, slump:15, agg:20, price:24700},
+    {strength:18, slump:18, agg:20, price:24900},
+
+    {strength:21, slump:8,  agg:20, price:24800},
+    {strength:21, slump:12, agg:20, price:25000},
+    {strength:21, slump:15, agg:20, price:25200},
+    {strength:21, slump:18, agg:20, price:25400},
+
+    {strength:24, slump:8,  agg:20, price:25100},
+    {strength:24, slump:12, agg:20, price:25400},
+    {strength:24, slump:15, agg:20, price:25600},
+    {strength:24, slump:18, agg:20, price:25900},
+
+    {strength:27, slump:8,  agg:20, price:25600},
+    {strength:27, slump:12, agg:20, price:25900},
+    {strength:27, slump:15, agg:20, price:26200},
+    {strength:27, slump:18, agg:20, price:26500},
+
+    {strength:30, slump:8,  agg:20, price:25900},
+    {strength:30, slump:12, agg:20, price:26300},
+    {strength:30, slump:15, agg:20, price:26600},
+    {strength:30, slump:18, agg:20, price:26900},
+
+    /* 40mm 早強 */
+    {strength:18, slump:8,  agg:40, price:24000},
+    {strength:18, slump:12, agg:40, price:24200},
+
+    {strength:21, slump:5,  agg:40, price:24100},
+    {strength:21, slump:8,  agg:40, price:24400},
+    {strength:21, slump:12, agg:40, price:24600},
+    {strength:21, slump:15, agg:40, price:24900},
+
+    {strength:24, slump:5,  agg:40, price:24400},
+    {strength:24, slump:8,  agg:40, price:24700},
+    {strength:24, slump:12, agg:40, price:24900},
+    {strength:24, slump:15, agg:40, price:25200},
+
+    {strength:27, slump:5,  agg:40, price:25000},
+    {strength:27, slump:8,  agg:40, price:25100},
+    {strength:27, slump:12, agg:40, price:25300},
+    {strength:27, slump:15, agg:40, price:25800},
+
+    {strength:30, slump:5,  agg:40, price:25300},
+    {strength:30, slump:8,  agg:40, price:25500},
+    {strength:30, slump:12, agg:40, price:25800},
+    {strength:30, slump:15, agg:40, price:26200}
+  ];
+
   const strengthMaster = [18, 21, 24, 27, 30];
   const slumpMaster = [5, 8, 12, 15, 18];
 
@@ -278,28 +387,42 @@
     });
   }
 
-  function hasPrice(strength, slump, agg){
-    const baseAgg = (agg === 15) ? 20 : agg;
-    return priceData.some(p =>
+  function getPriceDataByCement(cement){
+    return cement === "H" ? earlyPriceData : normalPriceData;
+  }
+
+  function getBaseAgg(agg){
+    return agg === 15 ? 20 : agg;
+  }
+
+  function hasPrice(strength, slump, agg, cement){
+    const baseAgg = getBaseAgg(agg);
+    const targetData = getPriceDataByCement(cement);
+
+    return targetData.some(p =>
       p.strength === strength &&
       p.slump === slump &&
       p.agg === baseAgg
     );
   }
 
-  function getAvailableStrengths(agg){
-    const baseAgg = (agg === 15) ? 20 : agg;
+  function getAvailableStrengths(agg, cement){
+    const baseAgg = getBaseAgg(agg);
+    const targetData = getPriceDataByCement(cement);
+
     return [...new Set(
-      priceData
+      targetData
         .filter(p => p.agg === baseAgg)
         .map(p => p.strength)
     )].sort((a, b) => a - b);
   }
 
-  function getAvailableSlumps(agg, strength){
-    const baseAgg = (agg === 15) ? 20 : agg;
+  function getAvailableSlumps(agg, strength, cement){
+    const baseAgg = getBaseAgg(agg);
+    const targetData = getPriceDataByCement(cement);
+
     return [...new Set(
-      priceData
+      targetData
         .filter(p => p.agg === baseAgg && p.strength === strength)
         .map(p => p.slump)
     )].sort((a, b) => a - b);
@@ -315,15 +438,11 @@
   }
 
   function renderStrengthButtons(){
-    const available = getAvailableStrengths(selectedAgg);
+    const available = getAvailableStrengths(selectedAgg, selectedCement);
     strengthButtonsEl.innerHTML = "";
 
     if (!available.includes(selectedStrength)) {
-      if (available.includes(18)) {
-        selectedStrength = 18;
-      } else {
-        selectedStrength = available.length ? available[0] : null;
-      }
+      selectedStrength = available.includes(18) ? 18 : (available[0] ?? null);
     }
 
     strengthMaster.forEach(v => {
@@ -347,14 +466,10 @@
       return;
     }
 
-    const available = getAvailableSlumps(selectedAgg, selectedStrength);
+    const available = getAvailableSlumps(selectedAgg, selectedStrength, selectedCement);
 
     if (!available.includes(selectedSlump)) {
-      if (available.includes(8)) {
-        selectedSlump = 8;
-      } else {
-        selectedSlump = available.length ? available[0] : null;
-      }
+      selectedSlump = available.includes(8) ? 8 : (available[0] ?? null);
     }
 
     slumpMaster.forEach(v => {
@@ -372,9 +487,10 @@
       return;
     }
 
-    const baseAgg = (selectedAgg === 15) ? 20 : selectedAgg;
+    const baseAgg = getBaseAgg(selectedAgg);
+    const targetData = getPriceDataByCement(selectedCement);
 
-    const item = priceData.find(p =>
+    const item = targetData.find(p =>
       p.strength === selectedStrength &&
       p.slump === selectedSlump &&
       p.agg === baseAgg
@@ -391,20 +507,48 @@
     }
 
     let price = item.price;
+
+    /* 15mm は 20mm ベース + 500円
+       早強Hでも同じルールで適用 */
     if (selectedAgg === 15) {
       price += 500;
     }
 
     const mixName = buildMixName(selectedStrength, selectedSlump, selectedAgg, selectedCement);
 
+    let note = "※ N・BB は通常単価です。";
+    if (selectedCement === "H") {
+      note = "※ H は早強単価表を使用し、15mmは20mm単価＋500円で計算しています。";
+    } else if (selectedAgg === 15) {
+      note = "※ 15mmは20mm単価＋500円です。";
+    }
+
     resultEl.innerHTML = `
       <div class="label">検索結果</div>
       <div class="price-box" style="margin-top:10px;">
         <div><strong>配合</strong>：${mixName}</div>
         <div class="price-main">${formatYen(price)}</div>
-        <div class="price-sub">※ BB・H は現在 N と同一単価です。</div>
+        <div class="price-sub">${note}</div>
       </div>
     `;
+  }
+
+  function resetToSafeDefaultIfNeeded(){
+    if (!hasPrice(selectedStrength, selectedSlump, selectedAgg, selectedCement)) {
+      selectedStrength = 18;
+      selectedSlump = 8;
+
+      if (!hasPrice(selectedStrength, selectedSlump, selectedAgg, selectedCement)) {
+        const strengths = getAvailableStrengths(selectedAgg, selectedCement);
+        selectedStrength = strengths[0] ?? null;
+
+        const slumps = selectedStrength
+          ? getAvailableSlumps(selectedAgg, selectedStrength, selectedCement)
+          : [];
+
+        selectedSlump = slumps.includes(8) ? 8 : (slumps[0] ?? null);
+      }
+    }
   }
 
   function refreshUI(){
@@ -418,16 +562,11 @@
   strengthButtonsEl.addEventListener("click", (e) => {
     if (e.target.tagName !== "BUTTON" || e.target.classList.contains("hidden")) return;
 
-    const newStrength = Number(e.target.dataset.v);
-    selectedStrength = newStrength;
+    selectedStrength = Number(e.target.dataset.v);
 
-    const availableSlumps = getAvailableSlumps(selectedAgg, selectedStrength);
+    const availableSlumps = getAvailableSlumps(selectedAgg, selectedStrength, selectedCement);
     if (!availableSlumps.includes(selectedSlump)) {
-      if (availableSlumps.includes(8)) {
-        selectedSlump = 8;
-      } else {
-        selectedSlump = availableSlumps.length ? availableSlumps[0] : null;
-      }
+      selectedSlump = availableSlumps.includes(8) ? 8 : (availableSlumps[0] ?? null);
     }
 
     renderStrengthButtons();
@@ -446,14 +585,8 @@
   aggButtonsEl.addEventListener("click", (e) => {
     if (e.target.tagName !== "BUTTON") return;
 
-    const newAgg = Number(e.target.dataset.v);
-    selectedAgg = newAgg;
-
-    if (!hasPrice(selectedStrength, selectedSlump, selectedAgg)) {
-      selectedStrength = 18;
-      selectedSlump = 8;
-    }
-
+    selectedAgg = Number(e.target.dataset.v);
+    resetToSafeDefaultIfNeeded();
     refreshUI();
   });
 
@@ -461,10 +594,61 @@
     if (e.target.tagName !== "BUTTON") return;
 
     selectedCement = e.target.dataset.v;
-    setActiveButton(cementButtonsEl, selectedCement);
-    searchPrice();
+    resetToSafeDefaultIfNeeded();
+    refreshUI();
   });
 
+  const normalPdfUrl = "{{ url_for('static', filename='pdf/price_list_2026.pdf') }}";
+  const earlyPdfUrl = "{{ url_for('static', filename='pdf/early_strength_price_list.pdf') }}";
+
+  let selectedPdfUrl = normalPdfUrl;
+  let selectedPdfLabel = "単価表";
+
+  const btnNormalPdf = document.getElementById("btnNormalPdf");
+  const btnEarlyPdf = document.getElementById("btnEarlyPdf");
+  const btnShowPdf = document.getElementById("btnShowPdf");
+  const btnDownloadPdf = document.getElementById("btnDownloadPdf");
+  const pdfViewer = document.getElementById("pdfViewer");
+  const pdfViewerWrap = document.getElementById("pdfViewerWrap");
+  const selectedPdfLabelEl = document.getElementById("selectedPdfLabel");
+
+  function updatePdfSelectionButtons(){
+    if (selectedPdfLabel === "単価表") {
+      btnNormalPdf.classList.remove("btn-ghost");
+      btnNormalPdf.classList.add("btn-primary");
+
+      btnEarlyPdf.classList.remove("btn-primary");
+      btnEarlyPdf.classList.add("btn-ghost");
+    } else {
+      btnEarlyPdf.classList.remove("btn-ghost");
+      btnEarlyPdf.classList.add("btn-primary");
+
+      btnNormalPdf.classList.remove("btn-primary");
+      btnNormalPdf.classList.add("btn-ghost");
+    }
+
+    selectedPdfLabelEl.textContent = `選択中：${selectedPdfLabel}`;
+    btnDownloadPdf.href = selectedPdfUrl;
+  }
+
+  btnNormalPdf.addEventListener("click", () => {
+    selectedPdfUrl = normalPdfUrl;
+    selectedPdfLabel = "単価表";
+    updatePdfSelectionButtons();
+  });
+
+  btnEarlyPdf.addEventListener("click", () => {
+    selectedPdfUrl = earlyPdfUrl;
+    selectedPdfLabel = "早強単価表";
+    updatePdfSelectionButtons();
+  });
+
+  btnShowPdf.addEventListener("click", () => {
+    pdfViewer.src = selectedPdfUrl;
+    pdfViewerWrap.style.display = "block";
+  });
+
+  updatePdfSelectionButtons();
   refreshUI();
 </script>
 {% endblock %}
