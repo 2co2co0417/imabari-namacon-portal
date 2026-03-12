@@ -681,3 +681,34 @@ footer{
     height:50px;
   }
 }
+.callout-phone{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.callout-phone:hover{
+  transform:translateY(-1px);
+}
+
+.callout-phone:active{
+  transform:translateY(0);
+}
+
+.callout-phone:focus-visible{
+  outline:2px solid #3BAA9C;
+  outline-offset:2px;
+}
+
+.callout-phone .phone{
+  font-size:1.5rem;
+  font-weight:700;
+  line-height:1.2;
+}
+
+.callout-phone .muted{
+  color:#667085;
+}

@@ -15,11 +15,11 @@
           {{ session.get("user", {}).get("name", "") }}
         </div>
 
-        <div class="callout">
-          <div class="label">☎ ご注文専用電話</div>
-          <div class="phone">{{ order_phone }}</div>
-          <div class="muted" style="margin-top:8px;">※モックのため番号は仮です。</div>
-        </div>
+       <a href="tel:{{ order_phone|replace('-', '') }}" class="callout callout-phone" aria-label="ご注文専用電話に発信">
+         <div class="label">☎ ご注文専用電話</div>
+         <div class="phone">{{ order_phone }}</div>
+         <div class="muted" style="margin-top:8px;">タップで発信できます</div>
+       </a>
 
         <div class="actions">
           <a class="btn-primary" href="{{ url_for('map_send') }}">現場地図を送る</a>

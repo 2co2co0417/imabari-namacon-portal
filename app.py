@@ -148,14 +148,67 @@ def get_news_item(news_id):
 # -----------------------------
 # 全テンプレート共通データ
 # -----------------------------
+from datetime import datetime, date, time
+
+# 休業日設定
+def is_company_holiday(today):
+    y = today.year
+
+    # 年末年始
+    new_year_holidays = {
+        date(y, 1, 1),
+        date(y, 1, 2),
+        date(y, 1, 3),
+        date(y, 12, 29),
+        date(y, 12, 30),
+        date(y, 12, 31),
+    }
+
+    # お盆休み
+    obon_holidays = {
+        date(y, 8, 13),
+        date(y, 8, 14),
+        date(y, 8, 15),
+    }
+
+    # GW休み
+    gw_holidays = {
+        date(y, 5, 3),
+        date(y, 5, 4),
+        date(y, 5, 5),
+    }
+
+    return today in new_year_holidays or today in obon_holidays or today in gw_holidays
+
+
+def get_business_status():
+    now = datetime.now()
+    today = now.date()
+    current_time = now.time()
+
+    start_time = time(7, 50)
+    end_time = time(16, 30)
+
+    # 土日休み
+    if now.weekday() in [5, 6]:   # 土=5, 日=6
+        return "本日休業日"
+
+    # 特別休業日
+    if is_company_holiday(today):
+        return "本日休業日"
+
+    # 営業時間内
+    if start_time <= current_time <= end_time:
+        return "本日営業中　7:50〜16:30"
+
+    # 営業時間外
+    return "営業時間外　7:50〜16:30"
+
+
 @app.context_processor
 def inject_common():
     now = datetime.now()
-
-    if now.weekday() == 6:   # 日曜
-        status = "本日休業日"
-    else:
-        status = "本日営業中　8:00〜17:00"
+    status = get_business_status()
 
     return {
         "business_status": status,
@@ -272,15 +325,56 @@ def dashboard():
 @app.route("/map", methods=["GET", "POST"])
 @login_required
 def map_send():
-    if request.method == "POST":
-        site_name = request.form.get("site_name", "").strip()
-        map_url = request.form.get("map_url", "").strip()
-        note = request.form.get("note", "").strip()
 
-        flash(
-            f"（モック）現場地図を送信しました：{site_name if site_name else '現場名未入力'}",
-            "ok"
-        )
+    if request.method == "POST":
+
+        lat = request.form.get("lat", "").strip()
+        lng = request.form.get("lng", "").strip()
+        map_url = request.form.get("map_url", "").strip()
+        comment = request.form.get("comment", "").strip()
+
+        user = session.get("user", {})
+        company = user.get("company", "")
+        name = user.get("name", "")
+
+        if not lat or not lng:
+            flash("現在地を取得してから送信してください", "error")
+            return redirect(url_for("map_send"))
+
+        subject = "【現場地図】位置情報送信"
+
+        body = f"""
+現場位置の送信がありました
+
+【送信者】
+会社名: {company}
+担当者: {name}
+
+【位置情報】
+緯度: {lat}
+経度: {lng}
+
+【Googleマップ】
+{map_url}
+
+【コメント】
+{comment if comment else "なし"}
+"""
+
+        try:
+            msg = Message(
+                subject=subject,
+                recipients=[MAIL_TO],
+                body=body
+            )
+            mail.send(msg)
+
+            flash("現場地図を送信しました", "ok")
+
+        except Exception as e:
+            print("メール送信エラー:", e)
+            flash("メール送信に失敗しました", "error")
+
         return redirect(url_for("map_send"))
 
     return render_template("map.html")

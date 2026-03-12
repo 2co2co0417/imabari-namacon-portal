@@ -6,26 +6,138 @@
   <div class="card-h">
     <h1 class="hero-title">現場地図を送る</h1>
   </div>
-  <div class="card-b" style="max-width:720px; margin: 0 auto;">
-    <form method="post" class="form">
-      <label class="label">現場名</label>
-      <input class="input" name="site_name" placeholder="例：○○マンション新築工事">
 
-      <label class="label" style="margin-top:12px;">GoogleマップURL（または住所）</label>
-      <input class="input" name="map_url" placeholder="https://maps.app.goo.gl/...  または 住所">
+  <div class="card-b" style="max-width: 880px; margin: 0 auto;">
+    <form method="post" class="form" id="mapForm">
+      <div class="muted" style="margin-bottom:14px;">
+        現在地を取得して地図を表示し、その位置とコメントを送信できます。
+      </div>
 
-      <label class="label" style="margin-top:12px;">補足（任意）</label>
-      <textarea class="textarea" name="note" rows="4" placeholder="進入路の注意、集合場所など"></textarea>
+      <div class="map-toolbar" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+        <button type="button" class="btn-primary" id="btnGetLocation">現在地を取得</button>
+        <button type="button" class="btn-ghost" id="btnOpenGoogle" disabled>Googleマップで開く</button>
+      </div>
 
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-primary" type="submit">送信（モック）</button>
+      <div id="mapStatus" class="muted" style="margin-bottom:12px;">
+        まだ位置情報は取得していません。
+      </div>
+
+      <div class="map-wrap" style="margin-bottom:16px;">
+        <iframe
+          id="mapFrame"
+          title="現場地図"
+          src="https://www.google.com/maps?q=34.0661,132.9978&z=15&output=embed"
+          style="width:100%; height:420px; border:1px solid #d8e0e6; border-radius:14px; background:#fff;"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <div class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div>
+          <label class="label">緯度</label>
+          <input class="input" type="text" name="lat" id="lat" readonly placeholder="未取得">
+        </div>
+        <div>
+          <label class="label">経度</label>
+          <input class="input" type="text" name="lng" id="lng" readonly placeholder="未取得">
+        </div>
+      </div>
+
+      <input type="hidden" name="map_url" id="map_url">
+      <input type="hidden" name="accuracy" id="accuracy">
+
+      <label class="label">コメント（任意）</label>
+      <textarea
+        class="textarea"
+        name="comment"
+        rows="4"
+        placeholder="現場名、進入路の注意、集合場所など"></textarea>
+
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="submit" class="btn-primary">送信する</button>
         <a class="btn-ghost" href="{{ url_for('dashboard') }}">戻る</a>
       </div>
-    </form>
 
-    <div class="muted" style="margin-top:12px;">
-      ※本番では、送信先（今治生コン側）にメール送付＋履歴保存を行います。
-    </div>
+      <div class="muted" style="margin-top:12px;">
+        ※ログイン中の会社名・担当者名とあわせて送信されます。
+      </div>
+    </form>
   </div>
 </div>
+
+<script>
+(function () {
+  const btnGetLocation = document.getElementById("btnGetLocation");
+  const btnOpenGoogle = document.getElementById("btnOpenGoogle");
+  const mapFrame = document.getElementById("mapFrame");
+  const mapStatus = document.getElementById("mapStatus");
+  const latInput = document.getElementById("lat");
+  const lngInput = document.getElementById("lng");
+  const mapUrlInput = document.getElementById("map_url");
+  const accuracyInput = document.getElementById("accuracy");
+
+  let currentMapUrl = "";
+
+  function updateMap(lat, lng, accuracy) {
+    const latFixed = Number(lat).toFixed(6);
+    const lngFixed = Number(lng).toFixed(6);
+
+    const embedUrl = `https://www.google.com/maps?q=${latFixed},${lngFixed}&z=17&output=embed`;
+    const googleUrl = `https://www.google.com/maps?q=${latFixed},${lngFixed}`;
+
+    mapFrame.src = embedUrl;
+    latInput.value = latFixed;
+    lngInput.value = lngFixed;
+    mapUrlInput.value = googleUrl;
+    accuracyInput.value = accuracy ? Math.round(accuracy) : "";
+
+    currentMapUrl = googleUrl;
+    btnOpenGoogle.disabled = false;
+
+    let msg = `位置を取得しました（緯度 ${latFixed} / 経度 ${lngFixed}）`;
+    if (accuracy) {
+      msg += ` / 精度 約${Math.round(accuracy)}m`;
+    }
+    mapStatus.textContent = msg;
+  }
+
+  btnGetLocation.addEventListener("click", function () {
+    if (!navigator.geolocation) {
+      mapStatus.textContent = "この端末では位置情報が使えません。";
+      return;
+    }
+
+    mapStatus.textContent = "位置情報を取得しています…";
+
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        updateMap(
+          position.coords.latitude,
+          position.coords.longitude,
+          position.coords.accuracy
+        );
+      },
+      function (error) {
+        let msg = "位置情報を取得できませんでした。";
+        if (error.code === 1) msg = "位置情報の利用が許可されていません。";
+        if (error.code === 2) msg = "現在地を取得できませんでした。電波状況をご確認ください。";
+        if (error.code === 3) msg = "位置情報の取得がタイムアウトしました。";
+        mapStatus.textContent = msg;
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  });
+
+  btnOpenGoogle.addEventListener("click", function () {
+    if (currentMapUrl) {
+      window.open(currentMapUrl, "_blank");
+    }
+  });
+})();
+</script>
 {% endblock %}
