@@ -1,0 +1,35 @@
+{% extends "base_public.html" %}
+{% block title %}顧客管理ログイン{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">顧客管理ログイン</h1>
+  </div>
+
+  <div class="card-b" style="max-width:520px; margin: 0 auto;">
+    <form method="post" class="form">
+      <label class="label">管理ID</label>
+      <input
+        class="input"
+        name="username"
+        autocomplete="username"
+        required
+      >
+
+      <label class="label" style="margin-top:14px;">パスワード</label>
+      <input
+        class="input"
+        type="password"
+        name="password"
+        autocomplete="current-password"
+        required
+      >
+
+      <div style="margin-top:14px;">
+        <button class="btn-primary" type="submit">ログイン</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

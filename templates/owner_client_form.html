@@ -1,0 +1,50 @@
+{% extends "base_private.html" %}
+{% block title %}{% if mode == 'edit' %}顧客編集{% else %}顧客登録{% endif %}{% endblock %}
+
+{% block content %}
+<section aria-label="顧客登録・編集">
+  <div class="card">
+    <div class="card-h">
+      <h1 class="hero-title">
+        {% if mode == "edit" %}顧客編集{% else %}顧客登録{% endif %}
+      </h1>
+    </div>
+
+    <div class="card-b" style="max-width:640px;">
+      <form method="post" class="form">
+        <label class="label">会社名</label>
+        <input
+          class="input"
+          name="company"
+          value="{{ client.company if client else '' }}"
+          required
+        >
+
+        <label class="label" style="margin-top:14px;">担当者名</label>
+        <input
+          class="input"
+          name="name"
+          value="{{ client.name if client else '' }}"
+          required
+        >
+
+        <label class="label" style="margin-top:14px;">電話番号</label>
+        <input
+          class="input"
+          name="phone"
+          inputmode="numeric"
+          value="{{ client.phone if client else '' }}"
+          required
+        >
+
+        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-primary" type="submit">
+            {% if mode == "edit" %}更新する{% else %}登録する{% endif %}
+          </button>
+          <a class="btn-ghost" href="{{ url_for('owner_clients') }}">戻る</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

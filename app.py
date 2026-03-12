@@ -15,11 +15,14 @@ app = Flask(
     template_folder="templates",
     static_folder="static"
 )
-app.secret_key = "dev-secret-change-me"
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
 MAIL_USERNAME = os.getenv("MAIL_USERNAME", "").strip()
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "").strip()
 MAIL_TO = os.getenv("MAIL_TO", "2co2co0417@gmail.com").strip()
+
+OWNER_USERNAME = os.getenv("OWNER_USERNAME", "owner").strip()
+OWNER_PASSWORD = os.getenv("OWNER_PASSWORD", "change-me").strip()
 
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 587
@@ -43,6 +46,13 @@ MIX_OPTIONS = [
 def allowed_image(filename):
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     return ext in {"jpg", "jpeg", "png", "heic", "webp"}
+
+
+def mask_phone(phone):
+    phone = (phone or "").strip()
+    if len(phone) >= 8:
+        return f"{phone[:3]}****{phone[-4:]}"
+    return "****"
 
 
 print("BASE_DIR =", BASE_DIR)
@@ -78,14 +88,6 @@ def add_no_cache_headers(response):
     return response
 
 
-# --- モック：ログイン用（本番はDB/取引先マスタに置き換え） ---
-DEMO_USER = {
-    "phone": "09000000000",   # 仮
-    "password": "1234",       # 仮
-    "company": "○○建設",
-    "name": "田中様"
-}
-
 # --- モック：お知らせ（本番はDBへ） ---
 NEWS = [
     {
@@ -117,6 +119,16 @@ def login_required(view_func):
     return wrapped
 
 
+def owner_required(view_func):
+    @wraps(view_func)
+    def wrapped(*args, **kwargs):
+        if not session.get("owner_user"):
+            flash("顧客管理にログインしてください。", "error")
+            return redirect(url_for("owner_login"))
+        return view_func(*args, **kwargs)
+    return wrapped
+
+
 # -----------------------------
 # お知らせ取得（モック版）
 # -----------------------------
@@ -140,7 +152,6 @@ def get_news_item(news_id):
 def inject_common():
     now = datetime.now()
 
-    # 簡易営業ステータス
     if now.weekday() == 6:   # 日曜
         status = "本日休業日"
     else:
@@ -150,7 +161,8 @@ def inject_common():
         "business_status": status,
         "order_phone": ORDER_PHONE,
         "now_year": now.year,
-        "news": get_news_list(3)
+        "news": get_news_list(3),
+        "mask_phone": mask_phone
     }
 
 
@@ -173,7 +185,6 @@ def contact():
             return redirect(url_for("contact"))
 
         to_email = os.getenv("MAIL_TO", "2co2co0417@gmail.com")
-
         subject = f"【お問い合わせ】{company} {name}様"
 
         body = f"""株式会社今治生コンのWebサイトからお問い合わせが届きました。
@@ -212,7 +223,7 @@ def contact():
     return render_template("contact.html")
 
 
-# --- ログイン ---
+# --- 取引先ログイン ---
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -220,7 +231,7 @@ def login():
 
         db = get_db()
         user = db.execute(
-            "SELECT id, company, name, phone FROM clients WHERE phone = ?",
+            "SELECT id, company, name, phone FROM clients WHERE phone = ? AND is_active = 1",
             (phone,)
         ).fetchone()
 
@@ -234,7 +245,7 @@ def login():
             next_url = request.args.get("next") or url_for("dashboard")
             return redirect(next_url)
 
-        flash("この電話番号は登録されていません（モック）", "ng")
+        flash("このログインIDは登録されていません。", "ng")
         return redirect(url_for("login"))
 
     return render_template("login.html")
@@ -262,7 +273,6 @@ def dashboard():
 @login_required
 def map_send():
     if request.method == "POST":
-        # 本番：地図URL/住所→メール送信、履歴保存
         site_name = request.form.get("site_name", "").strip()
         map_url = request.form.get("map_url", "").strip()
         note = request.form.get("note", "").strip()
@@ -326,7 +336,6 @@ def mix_report():
         custom_list = [x.strip() for x in custom_mix.replace("、", ",").split(",") if x.strip()]
         all_mixes.extend(custom_list)
 
-    # 重複除去（順番維持）
     unique_mixes = []
     seen = set()
     for m in all_mixes:
@@ -406,7 +415,6 @@ def mix_report():
 @app.route("/price")
 @login_required
 def price():
-    # 本番：顧客別価格・適用期間・PDFダウンロードなど
     return render_template("price.html")
 
 
@@ -423,6 +431,146 @@ def news_detail(news_id: int):
     if not item:
         abort(404)
     return render_template("news_detail.html", item=item)
+
+
+# -----------------------------
+# 吉田さん専用 顧客管理
+# -----------------------------
+@app.route("/owner/login", methods=["GET", "POST"])
+def owner_login():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+
+        if username == OWNER_USERNAME and password == OWNER_PASSWORD:
+            session["owner_user"] = username
+            flash("顧客管理にログインしました。", "ok")
+            return redirect(url_for("owner_clients"))
+
+        flash("管理IDまたはパスワードが違います。", "error")
+        return redirect(url_for("owner_login"))
+
+    return render_template("owner_login.html")
+
+
+@app.route("/owner/logout")
+def owner_logout():
+    session.pop("owner_user", None)
+    flash("顧客管理からログアウトしました。", "ok")
+    return redirect(url_for("index"))
+
+
+@app.route("/owner/clients")
+@owner_required
+def owner_clients():
+    db = get_db()
+    clients = db.execute(
+        """
+        SELECT id, company, name, phone, is_active, created_at
+        FROM clients
+        ORDER BY id DESC
+        """
+    ).fetchall()
+    return render_template("owner_clients.html", clients=clients)
+
+
+@app.route("/owner/clients/new", methods=["GET", "POST"])
+@owner_required
+def owner_client_new():
+    if request.method == "POST":
+        company = request.form.get("company", "").strip()
+        name = request.form.get("name", "").strip()
+        phone = request.form.get("phone", "").strip()
+
+        if not company or not name or not phone:
+            flash("会社名・担当者名・電話番号を入力してください。", "error")
+            return render_template("owner_client_form.html", mode="new", client=None)
+
+        db = get_db()
+        try:
+            db.execute(
+                """
+                INSERT INTO clients (company, name, phone, is_active)
+                VALUES (?, ?, ?, 1)
+                """,
+                (company, name, phone)
+            )
+            db.commit()
+            flash("顧客を登録しました。", "ok")
+            return redirect(url_for("owner_clients"))
+
+        except Exception as e:
+            print("owner_client_new error:", e)
+            flash("登録に失敗しました。同じ電話番号がすでに登録されている可能性があります。", "error")
+            return render_template("owner_client_form.html", mode="new", client=None)
+
+    return render_template("owner_client_form.html", mode="new", client=None)
+
+
+@app.route("/owner/clients/<int:client_id>/edit", methods=["GET", "POST"])
+@owner_required
+def owner_client_edit(client_id):
+    db = get_db()
+    client = db.execute(
+        "SELECT id, company, name, phone, is_active, created_at FROM clients WHERE id = ?",
+        (client_id,)
+    ).fetchone()
+
+    if not client:
+        abort(404)
+
+    if request.method == "POST":
+        company = request.form.get("company", "").strip()
+        name = request.form.get("name", "").strip()
+        phone = request.form.get("phone", "").strip()
+
+        if not company or not name or not phone:
+            flash("会社名・担当者名・電話番号を入力してください。", "error")
+            return render_template("owner_client_form.html", mode="edit", client=client)
+
+        try:
+            db.execute(
+                """
+                UPDATE clients
+                SET company = ?, name = ?, phone = ?
+                WHERE id = ?
+                """,
+                (company, name, phone, client_id)
+            )
+            db.commit()
+            flash("顧客情報を更新しました。", "ok")
+            return redirect(url_for("owner_clients"))
+
+        except Exception as e:
+            print("owner_client_edit error:", e)
+            flash("更新に失敗しました。同じ電話番号がすでに登録されている可能性があります。", "error")
+            return render_template("owner_client_form.html", mode="edit", client=client)
+
+    return render_template("owner_client_form.html", mode="edit", client=client)
+
+
+@app.route("/owner/clients/<int:client_id>/toggle", methods=["POST"])
+@owner_required
+def owner_client_toggle(client_id):
+    db = get_db()
+    client = db.execute(
+        "SELECT id, is_active FROM clients WHERE id = ?",
+        (client_id,)
+    ).fetchone()
+
+    if not client:
+        abort(404)
+
+    new_status = 0 if client["is_active"] else 1
+
+    db.execute(
+        "UPDATE clients SET is_active = ? WHERE id = ?",
+        (new_status, client_id)
+    )
+    db.commit()
+
+    flash("利用状態を更新しました。", "ok")
+    return redirect(url_for("owner_clients"))
 
 
 if __name__ == "__main__":
