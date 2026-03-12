@@ -1,0 +1,53 @@
+{% extends "base_private.html" %}
+{% block title %}お知らせ投稿{% endblock %}
+
+{% block content %}
+<section class="card" style="max-width:980px;">
+  <div class="card-h">
+    <h1>{% if mode == 'edit' %}お知らせ編集{% else %}お知らせ新規投稿{% endif %}</h1>
+  </div>
+
+  <div class="card-b">
+    <form method="post" style="display:grid; gap:16px;">
+      <div style="display:grid; gap:8px; max-width:260px;">
+        <label for="notice_date">掲載日</label>
+        <input
+          id="notice_date"
+          name="notice_date"
+          type="date"
+          value="{{ notice.notice_date if notice and notice.notice_date else '' }}"
+          required
+        >
+      </div>
+
+      <div style="display:grid; gap:8px; max-width:520px;">
+        <label for="title">タイトル</label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          value="{{ notice.title if notice and notice.title else '' }}"
+          required
+        >
+      </div>
+
+      <div style="display:grid; gap:8px; max-width:720px;">
+        <label for="body">本文</label>
+        <textarea
+          id="body"
+          name="body"
+          rows="8"
+          required
+        >{{ notice.body if notice and notice.body else '' }}</textarea>
+      </div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button type="submit" class="btn-primary">
+          {% if mode == 'edit' %}更新する{% else %}投稿する{% endif %}
+        </button>
+        <a class="btn-ghost" href="{{ url_for('owner_notices') }}">戻る</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

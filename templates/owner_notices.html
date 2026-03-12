@@ -1,0 +1,56 @@
+{% extends "base_private.html" %}
+{% block title %}お知らせ管理{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-h" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <h1>お知らせ管理</h1>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a class="btn-ghost" href="{{ url_for('owner_dashboard') }}">管理トップ</a>
+      <a class="btn-primary" href="{{ url_for('owner_notice_new') }}">新規投稿</a>
+    </div>
+  </div>
+
+  <div class="card-b">
+    {% if notices %}
+      <div style="display:grid; gap:12px;">
+        {% for n in notices %}
+          <div class="card">
+            <div class="card-b">
+              <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+                <div style="flex:1; min-width:240px;">
+                  <div style="font-weight:700; font-size:1.1rem; margin-bottom:6px;">
+                    {{ n.title }}
+                  </div>
+
+                  <div class="muted" style="margin-bottom:10px;">
+                    掲載日：{{ n.notice_date }}
+                  </div>
+
+                  <div style="white-space:pre-wrap; line-height:1.7;">
+                    {{ n.body }}
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <a class="btn-ghost" href="{{ url_for('owner_notice_edit', notice_id=n.id) }}">編集</a>
+
+                  <form method="post"
+                        action="{{ url_for('owner_notice_delete', notice_id=n.id) }}"
+                        style="display:inline;"
+                        onsubmit="return confirm('このお知らせを削除しますか？');">
+                    <button type="submit" class="btn-ghost">削除</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">まだお知らせはありません。</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

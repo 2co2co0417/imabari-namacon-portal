@@ -1,0 +1,50 @@
+{% extends "base_private.html" %}
+{% block title %}オーナーダッシュボード{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-h">
+    <h1>オーナーダッシュボード</h1>
+  </div>
+  <div class="card-b" style="display:grid; gap:16px;">
+    <div class="actions" style="display:flex; gap:12px; flex-wrap:wrap;">
+      <a class="btn-primary" href="{{ url_for('owner_clients') }}">顧客管理</a>
+      <a class="btn-primary" href="{{ url_for('owner_notices') }}">お知らせ管理</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+      <div class="card">
+        <div class="card-b">
+          <div class="muted">登録顧客数</div>
+          <div style="font-size:28px; font-weight:700;">{{ client_count }}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-b">
+          <div class="muted">お知らせ件数</div>
+          <div style="font-size:28px; font-weight:700;">{{ notice_count }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">
+        <h2>最新のお知らせ</h2>
+      </div>
+      <div class="card-b">
+        {% if notices %}
+          <ul style="margin:0; padding-left:18px;">
+            {% for n in notices %}
+              <li style="margin-bottom:10px;">
+                <strong>{{ n.title }}</strong>（{{ n.date }}）
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">まだお知らせはありません。</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -2,54 +2,53 @@
 {% block title %}顧客管理{% endblock %}
 
 {% block content %}
-<section aria-label="顧客管理">
-  <div class="card">
-    <div class="card-h" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-      <h1 class="hero-title">顧客管理</h1>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <a class="btn-primary" href="{{ url_for('owner_client_new') }}">新規登録</a>
-        <a class="btn-ghost" href="{{ url_for('owner_logout') }}">ログアウト</a>
-      </div>
+<section class="card">
+  <div class="card-h" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <h1>顧客管理</h1>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a class="btn-ghost" href="{{ url_for('owner_dashboard') }}">管理トップ</a>
+      <a class="btn-primary" href="{{ url_for('owner_client_new') }}">新規登録</a>
     </div>
+  </div>
 
-    <div class="card-b">
-      {% if clients %}
+  <div class="card-b">
+    {% if clients %}
       <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
           <thead>
-            <tr style="border-bottom:1px solid #e5e7eb;">
+            <tr style="border-bottom:1px solid #ddd;">
               <th style="text-align:left; padding:10px;">ID</th>
+              <th style="text-align:left; padding:10px;">顧客番号</th>
               <th style="text-align:left; padding:10px;">会社名</th>
               <th style="text-align:left; padding:10px;">担当者名</th>
               <th style="text-align:left; padding:10px;">電話番号</th>
-              <th style="text-align:left; padding:10px;">状態</th>
+              <th style="text-align:left; padding:10px;">利用状態</th>
               <th style="text-align:left; padding:10px;">登録日</th>
               <th style="text-align:left; padding:10px;">操作</th>
             </tr>
           </thead>
           <tbody>
             {% for c in clients %}
-            <tr style="border-bottom:1px solid #f1f5f9;">
+            <tr style="border-bottom:1px solid #eee; vertical-align:top;">
               <td style="padding:10px;">{{ c.id }}</td>
+              <td style="padding:10px;">{{ c.customer_no or "" }}</td>
               <td style="padding:10px;">{{ c.company }}</td>
               <td style="padding:10px;">{{ c.name }}</td>
-              <td style="padding:10px;">{{ mask_phone(c.phone) }}</td>
-              <td style="padding:10px;">
-                {% if c.is_active %}
-                  <span class="muted">利用中</span>
-                {% else %}
-                  <span class="muted">停止中</span>
-                {% endif %}
-              </td>
+              <td style="padding:10px;">{{ c.phone }}</td>
+              <td style="padding:10px;">{{ "利用中" if c.is_active else "停止中" }}</td>
               <td style="padding:10px;">{{ c.created_at }}</td>
               <td style="padding:10px;">
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
                   <a class="btn-ghost" href="{{ url_for('owner_client_edit', client_id=c.id) }}">編集</a>
 
                   <form method="post" action="{{ url_for('owner_client_toggle', client_id=c.id) }}" style="display:inline;">
-                    <button class="btn-ghost" type="submit">
-                      {% if c.is_active %}停止{% else %}再開{% endif %}
+                    <button type="submit" class="btn-ghost">
+                      {{ "停止" if c.is_active else "再開" }}
                     </button>
+                  </form>
+
+                  <form method="post" action="{{ url_for('owner_client_delete', client_id=c.id) }}" style="display:inline;" onsubmit="return confirm('この顧客を削除しますか？');">
+                    <button type="submit" class="btn-ghost">削除</button>
                   </form>
                 </div>
               </td>
@@ -58,10 +57,9 @@
           </tbody>
         </table>
       </div>
-      {% else %}
-        <div class="muted">まだ顧客は登録されていません。</div>
-      {% endif %}
-    </div>
+    {% else %}
+      <p class="muted">登録されている顧客はまだありません。</p>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
