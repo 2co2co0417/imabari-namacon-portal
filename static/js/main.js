@@ -6,3 +6,22 @@
     else d.removeAttribute('open');
   });
 })();
+
+// ハンバーガーメニュー
+(function initHamburgerMenu(){
+  const toggle = document.querySelector('.menu-toggle');
+  const nav = document.getElementById('global-nav');
+
+  if(!toggle || !nav) return;
+
+  toggle.addEventListener('click', function(){
+    nav.classList.toggle('open');
+  });
+
+  document.addEventListener('click', function(e){
+    if(!nav.contains(e.target) && !toggle.contains(e.target)){
+      nav.classList.remove('open');
+    }
+  });
+
+})();

@@ -1,43 +1,9 @@
-<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{% block title %}株式会社今治生コン{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='3') }}">
-  {% block head %}{% endblock %}
-</head>
-<body>
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">株式会社今治生コン</div>
-      <nav class="nav" aria-label="グローバルナビゲーション">
-        <a href="{{ url_for('index') }}">公開トップ</a>
-        <a href="{{ url_for('login') }}">ログイン</a>
-        <a href="{{ url_for('contact') }}">お問い合わせ</a>
-        <div class="status" title="営業状況（モック）">
-          <span class="dot" aria-hidden="true"></span>
-          {{ business_status }}
-        </div>
-      </nav>
-    </div>
-  </div>
+{% extends "base.html" %}
 
-  <div class="wrap">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-wrap">
-          {% for category, msg in messages %}
-            <div class="flash flash-{{ category }}">{{ msg }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+{% block title %}株式会社今治生コン{% endblock %}
 
-    {% block content %}{% endblock %}
-  </div>
-
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  {% block scripts %}{% endblock %}
-</body>
-</html>
+{% block global_nav %}
+  <a href="{{ url_for('index') }}">公開トップ</a>
+  <a href="{{ url_for('login') }}">ログイン</a>
+  <a href="{{ url_for('contact') }}">お問い合わせ</a>
+{% endblock %}
