@@ -1,19 +1,19 @@
-DROP TABLE IF EXISTS clients;
 DROP TABLE IF EXISTS notices;
+DROP TABLE IF EXISTS clients;
 
 CREATE TABLE clients (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     company TEXT NOT NULL,
     name TEXT NOT NULL,
     phone TEXT NOT NULL UNIQUE,
-    is_active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE notices (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     body TEXT NOT NULL,
-    notice_date TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    notice_date DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
