@@ -238,12 +238,11 @@ def login():
         phone = request.form.get("phone", "").strip()
 
         db = get_db()
-
         user = db.execute(
             """
             SELECT id, company, name, phone
             FROM clients
-            WHERE phone = %s AND is_active = 1
+            WHERE phone = %s AND is_active = TRUE
             """,
             (phone,)
         ).fetchone()
@@ -255,13 +254,13 @@ def login():
                 "name": user["name"],
                 "phone": user["phone"]
             }
-
             return redirect(url_for("dashboard"))
 
         flash("ログイン情報が正しくありません。", "error")
         return redirect(url_for("login"))
 
     return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
@@ -495,7 +494,7 @@ def owner_clients():
     db = get_db()
     clients = db.execute(
         """
-        SELECT id, customer_no, company, name, phone, is_active, created_at
+        SELECT id, company, name, phone, is_active, created_at
         FROM clients
         ORDER BY id DESC
         """
@@ -507,13 +506,11 @@ def owner_clients():
 @owner_required
 def owner_client_new():
     if request.method == "POST":
-        customer_no = request.form.get("customer_no", "").strip()
         company = request.form.get("company", "").strip()
         name = request.form.get("name", "").strip()
         phone = request.form.get("phone", "").strip()
 
         form_client = {
-            "customer_no": customer_no,
             "company": company,
             "name": name,
             "phone": phone
@@ -527,10 +524,10 @@ def owner_client_new():
         try:
             db.execute(
                 """
-                INSERT INTO clients (customer_no, company, name, phone, is_active)
-                VALUES (%s, %s, %s, %s, 1)
+                INSERT INTO clients (company, name, phone, is_active)
+                VALUES (%s, %s, %s, TRUE)
                 """,
-                (customer_no, company, name, phone)
+                (company, name, phone)
             )
             db.commit()
             flash("顧客を登録しました。", "ok")
@@ -538,7 +535,8 @@ def owner_client_new():
 
         except Exception as e:
             print("owner_client_new error:", e)
-            flash("登録に失敗しました。電話番号または顧客番号が重複している可能性があります。", "error")
+            db.rollback()
+            flash("登録に失敗しました。電話番号が重複している可能性があります。", "error")
             return render_template("owner_client_form.html", mode="new", client=form_client)
 
     return render_template("owner_client_form.html", mode="new", client={})
@@ -550,7 +548,7 @@ def owner_client_edit(client_id):
     db = get_db()
     client = db.execute(
         """
-        SELECT id, customer_no, company, name, phone, is_active, created_at
+        SELECT id, company, name, phone, is_active, created_at
         FROM clients
         WHERE id = %s
         """,
@@ -561,14 +559,12 @@ def owner_client_edit(client_id):
         abort(404)
 
     if request.method == "POST":
-        customer_no = request.form.get("customer_no", "").strip()
         company = request.form.get("company", "").strip()
         name = request.form.get("name", "").strip()
         phone = request.form.get("phone", "").strip()
 
         form_client = {
             "id": client_id,
-            "customer_no": customer_no,
             "company": company,
             "name": name,
             "phone": phone,
@@ -583,10 +579,10 @@ def owner_client_edit(client_id):
             db.execute(
                 """
                 UPDATE clients
-                SET customer_no = %s, company = %s, name = %s, phone = %
+                SET company = %s, name = %s, phone = %s
                 WHERE id = %s
                 """,
-                (customer_no, company, name, phone, client_id)
+                (company, name, phone, client_id)
             )
             db.commit()
             flash("顧客情報を更新しました。", "ok")
@@ -594,7 +590,8 @@ def owner_client_edit(client_id):
 
         except Exception as e:
             print("owner_client_edit error:", e)
-            flash("更新に失敗しました。電話番号または顧客番号が重複している可能性があります。", "error")
+            db.rollback()
+            flash("更新に失敗しました。電話番号が重複している可能性があります。", "error")
             return render_template("owner_client_form.html", mode="edit", client=form_client)
 
     return render_template("owner_client_form.html", mode="edit", client=client)
@@ -612,7 +609,7 @@ def owner_client_toggle(client_id):
     if not client:
         abort(404)
 
-    new_status = 0 if client["is_active"] else 1
+    new_status = not client["is_active"]
     db.execute("UPDATE clients SET is_active = %s WHERE id = %s", (new_status, client_id))
     db.commit()
 
