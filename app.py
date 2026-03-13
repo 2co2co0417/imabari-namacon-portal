@@ -101,7 +101,7 @@ def get_news_list(limit=3):
         SELECT id, title, body, notice_date
         FROM notices
         ORDER BY notice_date DESC, id DESC
-        LIMIT ?
+        LIMIT %s
         """,
         (limit,)
     ).fetchall()
