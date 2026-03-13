@@ -174,7 +174,7 @@ def inject_common():
         "business_status": get_business_status(),
         "order_phone": ORDER_PHONE,
         "now_year": now.year,
-        "news":  [],
+        "news": get_news_list(3),
         "mask_phone": mask_phone
     }
 
