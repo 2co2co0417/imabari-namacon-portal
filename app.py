@@ -124,7 +124,7 @@ def get_news_item(news_id):
         """
         SELECT id, title, body, notice_date
         FROM notices
-        WHERE id = ?
+        WHERE id = %s
         """,
         (news_id,)
     ).fetchone()
@@ -243,7 +243,7 @@ def login():
             """
             SELECT id, company, name, phone
             FROM clients
-            WHERE phone = ? AND is_active = 1
+            WHERE phone = %s AND is_active = 1
             """,
             (phone,)
         ).fetchone()
@@ -528,7 +528,7 @@ def owner_client_new():
             db.execute(
                 """
                 INSERT INTO clients (customer_no, company, name, phone, is_active)
-                VALUES (?, ?, ?, ?, 1)
+                VALUES (%s, %s, %s, %s, 1)
                 """,
                 (customer_no, company, name, phone)
             )
@@ -552,7 +552,7 @@ def owner_client_edit(client_id):
         """
         SELECT id, customer_no, company, name, phone, is_active, created_at
         FROM clients
-        WHERE id = ?
+        WHERE id = %s
         """,
         (client_id,)
     ).fetchone()
@@ -583,8 +583,8 @@ def owner_client_edit(client_id):
             db.execute(
                 """
                 UPDATE clients
-                SET customer_no = ?, company = ?, name = ?, phone = ?
-                WHERE id = ?
+                SET customer_no = %s, company = %s, name = %s, phone = %
+                WHERE id = %s
                 """,
                 (customer_no, company, name, phone, client_id)
             )
@@ -605,7 +605,7 @@ def owner_client_edit(client_id):
 def owner_client_toggle(client_id):
     db = get_db()
     client = db.execute(
-        "SELECT id, is_active FROM clients WHERE id = ?",
+        "SELECT id, is_active FROM clients WHERE id = %s",
         (client_id,)
     ).fetchone()
 
@@ -613,7 +613,7 @@ def owner_client_toggle(client_id):
         abort(404)
 
     new_status = 0 if client["is_active"] else 1
-    db.execute("UPDATE clients SET is_active = ? WHERE id = ?", (new_status, client_id))
+    db.execute("UPDATE clients SET is_active = %s WHERE id = %s", (new_status, client_id))
     db.commit()
 
     flash("利用状態を更新しました。", "ok")
@@ -624,12 +624,12 @@ def owner_client_toggle(client_id):
 @owner_required
 def owner_client_delete(client_id):
     db = get_db()
-    client = db.execute("SELECT id FROM clients WHERE id = ?", (client_id,)).fetchone()
+    client = db.execute("SELECT id FROM clients WHERE id = %s", (client_id,)).fetchone()
 
     if not client:
         abort(404)
 
-    db.execute("DELETE FROM clients WHERE id = ?", (client_id,))
+    db.execute("DELETE FROM clients WHERE id = %s", (client_id,))
     db.commit()
 
     flash("顧客を削除しました。", "ok")
@@ -663,7 +663,7 @@ def owner_notice_new():
 
         db = get_db()
         db.execute(
-            "INSERT INTO notices (title, body, notice_date) VALUES (?, ?, ?)",
+            "INSERT INTO notices (title, body, notice_date) VALUES (%s, %s, %s)",
             (title, body, notice_date)
         )
         db.commit()
@@ -683,7 +683,7 @@ def owner_notice_new():
 def owner_notice_edit(notice_id):
     db = get_db()
     notice = db.execute(
-        "SELECT id, title, body, notice_date FROM notices WHERE id = ?",
+        "SELECT id, title, body, notice_date FROM notices WHERE id = %s",
         (notice_id,)
     ).fetchone()
 
@@ -707,7 +707,7 @@ def owner_notice_edit(notice_id):
             return render_template("owner_notice_form.html", mode="edit", notice=notice_form)
 
         db.execute(
-            "UPDATE notices SET title = ?, body = ?, notice_date = ? WHERE id = ?",
+            "UPDATE notices SET title = %s, body = %s, notice_date = %s WHERE id = %s",
             (title, body, notice_date, notice_id)
         )
         db.commit()
@@ -722,12 +722,12 @@ def owner_notice_edit(notice_id):
 @owner_required
 def owner_notice_delete(notice_id):
     db = get_db()
-    notice = db.execute("SELECT id FROM notices WHERE id = ?", (notice_id,)).fetchone()
+    notice = db.execute("SELECT id FROM notices WHERE id = %s", (notice_id,)).fetchone()
 
     if not notice:
         abort(404)
 
-    db.execute("DELETE FROM notices WHERE id = ?", (notice_id,))
+    db.execute("DELETE FROM notices WHERE id = %s", (notice_id,))
     db.commit()
 
     flash("お知らせを削除しました。", "ok")
