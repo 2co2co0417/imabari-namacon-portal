@@ -578,13 +578,11 @@ def price():
 
 
 @app.route("/news")
-@login_required
 def news_list():
     return render_template("news_list.html", news=get_news_all())
 
 
 @app.route("/news/<int:news_id>")
-@login_required
 def news_detail(news_id):
     item = get_news_item(news_id)
     if not item:
