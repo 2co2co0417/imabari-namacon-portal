@@ -24,17 +24,14 @@ MAIL_TO = os.getenv("MAIL_TO", "2co2co0417@gmail.com").strip()
 OWNER_USERNAME = os.getenv("OWNER_USERNAME", "owner").strip()
 OWNER_PASSWORD = os.getenv("OWNER_PASSWORD", "change-me").strip()
 
-GUEST_USERNAME = os.getenv("GUEST_USERNAME", "guest").strip()
-GUEST_PASSWORD = os.getenv("GUEST_PASSWORD", "change-me").strip()
-
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
 app.config["MAIL_USERNAME"] = MAIL_USERNAME
 app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = MAIL_USERNAME
-app.config["UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "uploads")
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+app.config["MAIL_TIMEOUT"] = 10
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
@@ -196,6 +193,15 @@ def contact():
             flash("会社名・お名前・メールアドレス・お問い合わせ内容を入力してください。", "error")
             return redirect(url_for("contact"))
 
+        if not MAIL_USERNAME or not MAIL_PASSWORD or not MAIL_TO:
+            print("メール設定不足:", {
+                "MAIL_USERNAME": MAIL_USERNAME,
+                "MAIL_PASSWORD_SET": bool(MAIL_PASSWORD),
+                "MAIL_TO": MAIL_TO
+            })
+            flash("メール設定が未完了です。管理者にご確認ください。", "error")
+            return redirect(url_for("contact"))
+
         subject = f"【お問い合わせ】{company} {name}様"
         body = f"""株式会社今治生コンのWebサイトからお問い合わせが届きました。
 
@@ -218,48 +224,26 @@ def contact():
                 recipients=[MAIL_TO],
                 reply_to=email,
                 body=body,
-                sender=MAIL_USERNAME or MAIL_TO
+                sender=MAIL_USERNAME
             )
+
+            print("=== お問い合わせメール送信開始 ===")
+            print("MAIL_USERNAME =", MAIL_USERNAME)
+            print("MAIL_TO =", MAIL_TO)
+            print("reply_to =", email)
+
             mail.send(msg)
+
+            print("=== お問い合わせメール送信完了 ===")
             flash(f"お問い合わせを受け付けました。{name}様", "ok")
             return redirect(url_for("contact"))
 
         except Exception as e:
-            print("メール送信エラー:", e)
+            print("メール送信エラー:", repr(e))
             flash("お問い合わせの送信に失敗しました。", "error")
             return redirect(url_for("contact"))
 
     return render_template("contact.html")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        phone = request.form.get("phone", "").strip()
-
-        db = get_db()
-        user = db.execute(
-            """
-            SELECT id, company, name, phone
-            FROM clients
-            WHERE phone = %s AND is_active = TRUE
-            """,
-            (phone,)
-        ).fetchone()
-
-        if user:
-            session["user"] = {
-                "id": user["id"],
-                "company": user["company"],
-                "name": user["name"],
-                "phone": user["phone"]
-            }
-            return redirect(url_for("dashboard"))
-
-        flash("ログイン情報が正しくありません。", "error")
-        return redirect(url_for("login"))
-
-    return render_template("login.html")
 
 
 @app.route("/logout")
