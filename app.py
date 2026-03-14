@@ -33,6 +33,9 @@ app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = MAIL_USERNAME
 app.config["MAIL_TIMEOUT"] = 10
 
+app.config["UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "uploads")
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 mail = Mail(app)
