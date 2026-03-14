@@ -259,7 +259,7 @@ def login():
             """
             SELECT id, company, name, phone
             FROM clients
-            WHERE phone = %s AND is_active = 1
+            WHERE phone = %s AND is_active = true
             """,
             (phone,)
         ).fetchone()
