@@ -248,6 +248,36 @@ def contact():
 
     return render_template("contact.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        phone = request.form.get("phone", "").strip()
+
+        db = get_db()
+
+        user = db.execute(
+            """
+            SELECT id, company, name, phone
+            FROM clients
+            WHERE phone = ? AND is_active = 1
+            """,
+            (phone,)
+        ).fetchone()
+
+        if user:
+            session["user"] = {
+                "id": user["id"],
+                "company": user["company"],
+                "name": user["name"],
+                "phone": user["phone"]
+            }
+
+            return redirect(url_for("dashboard"))
+
+        flash("ログイン情報が正しくありません。", "error")
+        return redirect(url_for("login"))
+
+    return render_template("login.html")
 
 @app.route("/logout")
 def logout():
