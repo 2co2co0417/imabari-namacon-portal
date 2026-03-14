@@ -6,6 +6,7 @@ from flask_mail import Mail, Message
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import os
+import traceback
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -53,6 +54,23 @@ app.jinja_env.auto_reload = True
 
 init_db(app)
 app.teardown_appcontext(close_db)
+
+
+def log_mail_config(tag="MAIL"):
+    print(f"=== {tag}: MAIL CONFIG CHECK ===")
+    print("MAIL_SERVER =", app.config.get("MAIL_SERVER"))
+    print("MAIL_PORT =", app.config.get("MAIL_PORT"))
+    print("MAIL_USE_TLS =", app.config.get("MAIL_USE_TLS"))
+    print("MAIL_USE_SSL =", app.config.get("MAIL_USE_SSL"))
+    print("MAIL_USERNAME =", MAIL_USERNAME)
+    print("MAIL_PASSWORD_SET =", bool(MAIL_PASSWORD))
+    print("MAIL_TO =", MAIL_TO)
+    print("MAIL_DEFAULT_SENDER =", app.config.get("MAIL_DEFAULT_SENDER"))
+    print("=== END MAIL CONFIG CHECK ===")
+
+
+def mail_settings_ready():
+    return bool(MAIL_USERNAME and MAIL_PASSWORD and MAIL_TO)
 
 
 def allowed_image(filename):
@@ -184,6 +202,34 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/mail-test")
+def mail_test():
+    try:
+        print("=== MAIL TEST START ===")
+        log_mail_config("MAIL TEST")
+
+        if not mail_settings_ready():
+            return "メール設定不足"
+
+        msg = Message(
+            subject="送信テスト",
+            recipients=[MAIL_TO],
+            body="これは今治生コンポータルの送信テストです。",
+            sender=MAIL_USERNAME
+        )
+
+        print("MAIL TEST MESSAGE BUILD OK")
+        mail.send(msg)
+        print("MAIL TEST SEND SUCCESS")
+        return "メール送信成功"
+
+    except Exception as e:
+        print("=== MAIL TEST ERROR ===")
+        print("error repr =", repr(e))
+        traceback.print_exc()
+        return f"メール送信失敗: {repr(e)}"
+
+
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
@@ -192,16 +238,19 @@ def contact():
         email = request.form.get("email", "").strip()
         message = request.form.get("message", "").strip()
 
+        print("=== CONTACT POST START ===")
+        print("company =", company)
+        print("name =", name)
+        print("email =", email)
+        print("message_exists =", bool(message))
+
         if not company or not name or not email or not message:
+            print("CONTACT VALIDATION ERROR: required fields missing")
             flash("会社名・お名前・メールアドレス・お問い合わせ内容を入力してください。", "error")
             return redirect(url_for("contact"))
 
-        if not MAIL_USERNAME or not MAIL_PASSWORD or not MAIL_TO:
-            print("メール設定不足:", {
-                "MAIL_USERNAME": MAIL_USERNAME,
-                "MAIL_PASSWORD_SET": bool(MAIL_PASSWORD),
-                "MAIL_TO": MAIL_TO
-            })
+        if not mail_settings_ready():
+            log_mail_config("CONTACT")
             flash("メール設定が未完了です。管理者にご確認ください。", "error")
             return redirect(url_for("contact"))
 
@@ -222,31 +271,37 @@ def contact():
 """
 
         try:
+            log_mail_config("CONTACT BEFORE SEND")
+
             msg = Message(
                 subject=subject,
                 recipients=[MAIL_TO],
-                reply_to=email,
                 body=body,
-                sender=MAIL_USERNAME
+                sender=MAIL_USERNAME,
+                reply_to=email
             )
 
-            print("=== お問い合わせメール送信開始 ===")
-            print("MAIL_USERNAME =", MAIL_USERNAME)
-            print("MAIL_TO =", MAIL_TO)
+            print("=== CONTACT MAIL BUILD OK ===")
+            print("subject =", subject)
+            print("recipients =", [MAIL_TO])
+            print("sender =", MAIL_USERNAME)
             print("reply_to =", email)
 
             mail.send(msg)
 
-            print("=== お問い合わせメール送信完了 ===")
+            print("=== CONTACT MAIL SEND SUCCESS ===")
             flash(f"お問い合わせを受け付けました。{name}様", "ok")
             return redirect(url_for("contact"))
 
         except Exception as e:
-            print("メール送信エラー:", repr(e))
+            print("=== CONTACT MAIL SEND ERROR ===")
+            print("error repr =", repr(e))
+            traceback.print_exc()
             flash("お問い合わせの送信に失敗しました。", "error")
             return redirect(url_for("contact"))
 
     return render_template("contact.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -271,13 +326,13 @@ def login():
                 "name": user["name"],
                 "phone": user["phone"]
             }
-
             return redirect(url_for("dashboard"))
 
         flash("ログイン情報が正しくありません。", "error")
         return redirect(url_for("login"))
 
     return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
@@ -309,13 +364,25 @@ def map_send():
         company = user.get("company", "")
         name = user.get("name", "")
 
+        print("=== MAP POST START ===")
+        print("lat =", lat)
+        print("lng =", lng)
+        print("map_url =", map_url)
+        print("comment_exists =", bool(comment))
+        print("session_user =", user)
+
         if not lat or not lng:
+            print("MAP VALIDATION ERROR: lat/lng missing")
             flash("現在地を取得してから送信してください", "error")
             return redirect(url_for("map_send"))
 
+        if not mail_settings_ready():
+            log_mail_config("MAP")
+            flash("メール設定が未完了です。管理者にご確認ください。", "error")
+            return redirect(url_for("map_send"))
+
         subject = "【現場地図】位置情報送信"
-        body = f"""
-現場位置の送信がありました
+        body = f"""現場位置の送信がありました
 
 【送信者】
 会社名: {company}
@@ -333,11 +400,29 @@ def map_send():
 """
 
         try:
-            msg = Message(subject=subject, recipients=[MAIL_TO], body=body)
+            log_mail_config("MAP BEFORE SEND")
+
+            msg = Message(
+                subject=subject,
+                recipients=[MAIL_TO],
+                body=body,
+                sender=MAIL_USERNAME
+            )
+
+            print("=== MAP MAIL BUILD OK ===")
+            print("subject =", subject)
+            print("recipients =", [MAIL_TO])
+            print("sender =", MAIL_USERNAME)
+
             mail.send(msg)
+
+            print("=== MAP MAIL SEND SUCCESS ===")
             flash("現場地図を送信しました", "ok")
+
         except Exception as e:
-            print("メール送信エラー:", e)
+            print("=== MAP MAIL SEND ERROR ===")
+            print("error repr =", repr(e))
+            traceback.print_exc()
             flash("メール送信に失敗しました", "error")
 
         return redirect(url_for("map_send"))
@@ -363,11 +448,23 @@ def mix_report():
     note = request.form.get("note", "").strip()
     photo = request.files.get("photo")
 
+    print("=== MIX REPORT POST START ===")
+    print("project =", project)
+    print("report_date =", report_date)
+    print("copies =", copies)
+    print("selected_mixes =", selected_mixes)
+    print("custom_mix =", custom_mix)
+    print("note_exists =", bool(note))
+    print("photo_exists =", bool(photo))
+    print("photo_filename =", photo.filename if photo else None)
+
     if not photo or photo.filename == "":
+        print("MIX REPORT VALIDATION ERROR: photo missing")
         flash("工事番号・工事名が写った写真を添付してください。", "error")
         return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
     if not allowed_image(photo.filename):
+        print("MIX REPORT VALIDATION ERROR: invalid file type")
         flash("写真は JPG / JPEG / PNG / HEIC / WEBP を使用してください。", "error")
         return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
@@ -382,7 +479,10 @@ def mix_report():
             unique_mixes.append(m)
             seen.add(m)
 
+    print("unique_mixes =", unique_mixes)
+
     if not unique_mixes:
+        print("MIX REPORT VALIDATION ERROR: no mixes selected")
         flash("配合を1つ以上選択、または直接入力してください。", "error")
         return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
@@ -390,7 +490,15 @@ def mix_report():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     save_name = f"{timestamp}_{filename}"
     save_path = os.path.join(app.config["UPLOAD_FOLDER"], save_name)
-    photo.save(save_path)
+
+    try:
+        photo.save(save_path)
+        print("photo saved to =", save_path)
+    except Exception as e:
+        print("PHOTO SAVE ERROR:", repr(e))
+        traceback.print_exc()
+        flash("写真の保存に失敗しました。", "error")
+        return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
     user = session.get("user", {})
     company = user.get("company", "")
@@ -420,19 +528,44 @@ def mix_report():
 """
 
     try:
-        msg = Message(subject=subject, recipients=[MAIL_TO], body=body)
+        if not mail_settings_ready():
+            log_mail_config("MIX REPORT")
+            flash("メール設定が未完了です。管理者にご確認ください。", "error")
+            return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
+
+        log_mail_config("MIX REPORT BEFORE SEND")
+
+        msg = Message(
+            subject=subject,
+            recipients=[MAIL_TO],
+            body=body,
+            sender=MAIL_USERNAME
+        )
+
         with app.open_resource(save_path) as fp:
+            file_data = fp.read()
+            print("attachment_bytes =", len(file_data))
             msg.attach(
                 filename=save_name,
                 content_type=photo.content_type or "application/octet-stream",
-                data=fp.read()
+                data=file_data
             )
+
+        print("=== MIX REPORT MAIL BUILD OK ===")
+        print("subject =", subject)
+        print("recipients =", [MAIL_TO])
+        print("sender =", MAIL_USERNAME)
+
         mail.send(msg)
+
+        print("=== MIX REPORT MAIL SEND SUCCESS ===")
         flash("配合報告書の依頼を送信しました。", "success")
         return redirect(url_for("dashboard"))
 
     except Exception as e:
-        print("mix_report send error:", e)
+        print("=== MIX REPORT MAIL SEND ERROR ===")
+        print("error repr =", repr(e))
+        traceback.print_exc()
         flash("送信に失敗しました。メール設定をご確認ください。", "error")
         return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
