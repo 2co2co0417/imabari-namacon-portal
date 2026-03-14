@@ -293,8 +293,9 @@ def contact():
             flash(f"お問い合わせを受け付けました。{name}様", "ok")
             return redirect(url_for("contact"))
 
-        except Exception as e:
+        except BaseException as e:
             print("=== CONTACT MAIL SEND ERROR ===")
+            print("error type =", type(e))
             print("error repr =", repr(e))
             traceback.print_exc()
             flash("お問い合わせの送信に失敗しました。", "error")
