@@ -10,16 +10,17 @@
   <div class="card-b" style="max-width: 880px; margin: 0 auto;">
     <form method="post" class="form" id="mapForm">
       <div class="muted" style="margin-bottom:14px;">
-        現在地を取得して、その位置情報とコメントを送信できます。
+        現在地を取得して送ることも、現場にいなくても緯度・経度を指定して送ることもできます。
       </div>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
         <button type="button" class="btn-primary" id="btnGetLocation">現在地を取得</button>
+        <button type="button" class="btn-ghost" id="btnPreviewMap">地図を表示</button>
         <button type="button" class="btn-ghost" id="btnOpenGoogle" disabled>Googleマップで開く</button>
       </div>
 
       <div id="mapStatus" class="muted" style="margin-bottom:12px;">
-        まだ位置情報は取得していません。
+        まだ位置情報は設定していません。
       </div>
 
       <div id="mapPreviewBox" style="display:none; margin-bottom:16px;">
@@ -36,15 +37,16 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
         <div>
           <label class="label">緯度</label>
-          <input class="input" type="text" name="lat" id="lat" readonly placeholder="未取得">
+          <input class="input" type="text" name="lat" id="lat" placeholder="例: 34.066123">
         </div>
         <div>
           <label class="label">経度</label>
-          <input class="input" type="text" name="lng" id="lng" readonly placeholder="未取得">
+          <input class="input" type="text" name="lng" id="lng" placeholder="例: 132.997456">
         </div>
       </div>
 
       <input type="hidden" name="map_url" id="map_url">
+      <input type="hidden" name="location_method" id="location_method" value="manual">
 
       <label class="label">コメント（任意）</label>
       <textarea
@@ -59,7 +61,8 @@
       </div>
 
       <div class="muted" style="margin-top:12px;">
-        ※ログイン中の会社名・担当者名とあわせて送信されます。
+        ※ログイン中の会社名・担当者名とあわせて送信されます。<br>
+        ※現在地を使わない場合は、緯度・経度を直接入力してください。
       </div>
     </form>
   </div>
@@ -68,6 +71,7 @@
 <script>
 (function () {
   const btnGetLocation = document.getElementById("btnGetLocation");
+  const btnPreviewMap = document.getElementById("btnPreviewMap");
   const btnOpenGoogle = document.getElementById("btnOpenGoogle");
   const mapFrame = document.getElementById("mapFrame");
   const mapPreviewBox = document.getElementById("mapPreviewBox");
@@ -75,8 +79,52 @@
   const latInput = document.getElementById("lat");
   const lngInput = document.getElementById("lng");
   const mapUrlInput = document.getElementById("map_url");
+  const locationMethodInput = document.getElementById("location_method");
 
   let currentMapUrl = "";
+
+  function isValidCoordinate(lat, lng) {
+    const latNum = parseFloat(lat);
+    const lngNum = parseFloat(lng);
+
+    if (Number.isNaN(latNum) || Number.isNaN(lngNum)) {
+      return false;
+    }
+
+    if (latNum < -90 || latNum > 90) {
+      return false;
+    }
+
+    if (lngNum < -180 || lngNum > 180) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function updateMapPreview(methodLabel) {
+    const lat = latInput.value.trim();
+    const lng = lngInput.value.trim();
+
+    if (!isValidCoordinate(lat, lng)) {
+      mapStatus.textContent = "緯度・経度を正しく入力してください。";
+      mapPreviewBox.style.display = "none";
+      btnOpenGoogle.disabled = true;
+      mapUrlInput.value = "";
+      currentMapUrl = "";
+      return;
+    }
+
+    const googleUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+    const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
+
+    mapUrlInput.value = googleUrl;
+    currentMapUrl = googleUrl;
+    mapFrame.src = embedUrl;
+    mapPreviewBox.style.display = "block";
+    btnOpenGoogle.disabled = false;
+    mapStatus.textContent = `${methodLabel}（緯度 ${lat} / 経度 ${lng}）`;
+  }
 
   btnGetLocation.addEventListener("click", function () {
     if (!navigator.geolocation) {
@@ -91,19 +139,11 @@
         const lat = position.coords.latitude.toFixed(6);
         const lng = position.coords.longitude.toFixed(6);
 
-        const googleUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-        const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
-
         latInput.value = lat;
         lngInput.value = lng;
-        mapUrlInput.value = googleUrl;
-        currentMapUrl = googleUrl;
+        locationMethodInput.value = "current";
 
-        mapFrame.src = embedUrl;
-        mapPreviewBox.style.display = "block";
-        btnOpenGoogle.disabled = false;
-
-        mapStatus.textContent = `位置を取得しました（緯度 ${lat} / 経度 ${lng}）`;
+        updateMapPreview("現在地を取得しました");
       },
       function (error) {
         if (error.code === 1) {
@@ -122,6 +162,11 @@
         maximumAge: 0
       }
     );
+  });
+
+  btnPreviewMap.addEventListener("click", function () {
+    locationMethodInput.value = "manual";
+    updateMapPreview("指定位置を設定しました");
   });
 
   btnOpenGoogle.addEventListener("click", function () {

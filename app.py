@@ -350,6 +350,7 @@ def map_send():
         lng = request.form.get("lng", "").strip()
         map_url = request.form.get("map_url", "").strip()
         comment = request.form.get("comment", "").strip()
+        location_method = request.form.get("location_method", "manual").strip()
 
         user = session.get("user", {})
         company = user.get("company", "")
@@ -359,62 +360,56 @@ def map_send():
         print("lat =", lat)
         print("lng =", lng)
         print("map_url =", map_url)
+        print("location_method =", location_method)
         print("comment_exists =", bool(comment))
         print("session_user =", user)
 
         if not lat or not lng:
             print("MAP VALIDATION ERROR: lat/lng missing")
-            flash("現在地を取得してから送信してください", "error")
+            flash("緯度・経度を入力するか、現在地を取得してから送信してください。", "error")
             return redirect(url_for("map_send"))
-
-        if not mail_settings_ready():
-            log_mail_config("MAP")
-            flash("メール設定が未完了です。管理者にご確認ください。", "error")
-            return redirect(url_for("map_send"))
-
-        subject = "【現場地図】位置情報送信"
-        body = f"""現場位置の送信がありました
-
-【送信者】
-会社名: {company}
-担当者: {name}
-
-【位置情報】
-緯度: {lat}
-経度: {lng}
-
-【Googleマップ】
-{map_url}
-
-【コメント】
-{comment if comment else "なし"}
-"""
 
         try:
-            log_mail_config("MAP BEFORE SEND")
+            lat_num = float(lat)
+            lng_num = float(lng)
+        except ValueError:
+            flash("緯度・経度の形式が正しくありません。", "error")
+            return redirect(url_for("map_send"))
 
-            msg = Message(
-                subject=subject,
-                recipients=[MAIL_TO],
-                body=body,
-                sender=MAIL_USERNAME
+        if not (-90 <= lat_num <= 90) or not (-180 <= lng_num <= 180):
+            flash("緯度・経度の範囲が正しくありません。", "error")
+            return redirect(url_for("map_send"))
+
+        if not map_url:
+            map_url = f"https://www.google.com/maps?q={lat},{lng}"
+
+        method_label = "現在地取得" if location_method == "current" else "手動指定"
+
+        notification_message = f"""会社名: {company}
+担当者: {name}
+指定方法: {method_label}
+緯度: {lat}
+経度: {lng}
+Googleマップ: {map_url}
+
+コメント:
+{comment if comment else "なし"}"""
+
+        try:
+            create_notification(
+                "map",
+                title=f"現場地図送信: {company} {name}",
+                message=notification_message
             )
 
-            print("=== MAP MAIL BUILD OK ===")
-            print("subject =", subject)
-            print("recipients =", [MAIL_TO])
-            print("sender =", MAIL_USERNAME)
-
-            mail.send(msg)
-
-            print("=== MAP MAIL SEND SUCCESS ===")
-            flash("現場地図を送信しました", "ok")
+            print("=== MAP SAVE SUCCESS ===")
+            flash("現場地図を受け付けました。", "ok")
 
         except Exception as e:
-            print("=== MAP MAIL SEND ERROR ===")
+            print("=== MAP SAVE ERROR ===")
             print("error repr =", repr(e))
             traceback.print_exc()
-            flash("メール送信に失敗しました", "error")
+            flash("現場地図の受付に失敗しました。", "error")
 
         return redirect(url_for("map_send"))
 
