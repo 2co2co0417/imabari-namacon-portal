@@ -40,13 +40,24 @@
                 </div>
               </div>
 
-              {% if n["message"] %}
+                {% if n["message"] %}
                 <div style="margin-top:12px; white-space:pre-wrap; line-height:1.7;">
-                  {{ n["message"] }}
+                    {{ n["message"] }}
                 </div>
-              {% endif %}
+                {% endif %}
 
-              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+                {% if n["type"] == "map" and n["message"] and "Googleマップ:" in n["message"] %}
+                {% set map_url = n["message"].split("Googleマップ:")[1].split("\n")[0].strip() %}
+                {% if map_url %}
+                    <div style="margin-top:12px;">
+                    <a href="{{ map_url }}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                        地図を開く
+                    </a>
+                    </div>
+                {% endif %}
+                {% endif %}
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
                 {% if not n["is_read"] %}
                     <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
                     <button type="submit" class="btn-primary">確認済みにする</button>
@@ -60,7 +71,7 @@
                 <form method="post" action="{{ url_for('owner_notification_delete', notification_id=n['id']) }}" onsubmit="return confirm('この通知を削除しますか？');">
                     <button type="submit" class="btn-ghost">削除</button>
                 </form>
-                </div> 
+                </div>
             </div>
           </div>
         {% endfor %}
