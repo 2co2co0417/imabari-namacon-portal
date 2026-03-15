@@ -55,7 +55,19 @@ app.jinja_env.auto_reload = True
 init_db(app)
 app.teardown_appcontext(close_db)
 
+@app.context_processor
+def inject_notification_status():
+    try:
+        db = get_db()
+        row = db.execute(
+            "SELECT COUNT(*) AS cnt FROM notifications WHERE is_read = FALSE"
+        ).fetchone()
+        has_unread = row["cnt"] > 0
+    except Exception:
+        has_unread = False
 
+    return dict(has_unread=has_unread)
+    
 def log_mail_config(tag="MAIL"):
     print(f"=== {tag}: MAIL CONFIG CHECK ===")
     print("MAIL_SERVER =", app.config.get("MAIL_SERVER"))

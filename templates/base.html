@@ -15,7 +15,10 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a href="{{ url_for('index') }}" class="brand">株式会社今治生コン</a>
+      <a href="{{ url_for('index') }}" class="brand">
+  株式会社今治生コン
+  <span class="notify-dot {{ 'red' if has_unread else 'green' }}"></span>
+</a>
 
       <button
         class="menu-toggle"

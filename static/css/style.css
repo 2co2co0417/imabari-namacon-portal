@@ -63,6 +63,9 @@ body{
 }
 
 .brand{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
   font-weight: 800;
   color: var(--dark-800);
   letter-spacing: .02em;
@@ -837,4 +840,20 @@ footer{
   .stepper-input{
     height:50px;
   }
+}
+
+.notify-dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.notify-dot.red{
+  background:#d93025;
+}
+
+.notify-dot.green{
+  background:#2e7d32;
 }
