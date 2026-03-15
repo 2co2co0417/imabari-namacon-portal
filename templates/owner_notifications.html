@@ -1,0 +1,69 @@
+{% extends "base_private.html" %}
+{% block title %}通知管理{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-h" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <h1>通知管理</h1>
+    <a class="btn-ghost" href="{{ url_for('owner_dashboard') }}">管理トップへ戻る</a>
+  </div>
+
+  <div class="card-b">
+    {% if notifications %}
+      <div style="display:grid; gap:12px;">
+        {% for n in notifications %}
+          <div class="card inner-card" style="border:1px solid #ddd;">
+            <div class="card-b">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                <div>
+                  <div style="font-weight:800; color:var(--dark-800);">
+                    {% if not n["is_read"] %}
+                      ●
+                    {% endif %}
+                    {{ n["title"] or "通知" }}
+                  </div>
+                  <div class="muted" style="margin-top:6px;">
+                    種別: {{ n["type"] }} ／ {{ n["created_at"] }}
+                  </div>
+                </div>
+
+                <div>
+                  {% if n["is_read"] %}
+                    <span style="display:inline-block; padding:6px 10px; border-radius:999px; background:#e8f5e9; color:#2e7d32; font-weight:700;">
+                      確認済み
+                    </span>
+                  {% else %}
+                    <span style="display:inline-block; padding:6px 10px; border-radius:999px; background:#ffebee; color:#c62828; font-weight:700;">
+                      未確認
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if n["message"] %}
+                <div style="margin-top:12px; white-space:pre-wrap; line-height:1.7;">
+                  {{ n["message"] }}
+                </div>
+              {% endif %}
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+                {% if not n["is_read"] %}
+                  <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
+                    <button type="submit" class="btn-primary">確認済みにする</button>
+                  </form>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('owner_notification_delete', notification_id=n['id']) }}" onsubmit="return confirm('この通知を削除しますか？');">
+                  <button type="submit" class="btn-ghost">削除</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>通知はありません。</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -610,6 +610,10 @@ def owner_dashboard():
     db = get_db()
     client_count = db.execute("SELECT COUNT(*) AS cnt FROM clients").fetchone()["cnt"]
     notice_count = db.execute("SELECT COUNT(*) AS cnt FROM notices").fetchone()["cnt"]
+    unread_notification_count = db.execute(
+        "SELECT COUNT(*) AS cnt FROM notifications WHERE is_read = FALSE"
+    ).fetchone()["cnt"]
+
     latest_notices = db.execute(
         """
         SELECT id, title, body, notice_date
@@ -623,6 +627,7 @@ def owner_dashboard():
         "owner_dashboard.html",
         client_count=client_count,
         notice_count=notice_count,
+        unread_notification_count=unread_notification_count,
         latest_notices=latest_notices
     )
 
@@ -869,6 +874,61 @@ def owner_notice_delete(notice_id):
     flash("お知らせを削除しました。", "ok")
     return redirect(url_for("owner_notices"))
 
+@app.route("/owner/notifications")
+@owner_required
+def owner_notifications():
+    db = get_db()
+    notifications = db.execute(
+        """
+        SELECT id, type, title, message, is_read, created_at
+        FROM notifications
+        ORDER BY is_read ASC, created_at DESC, id DESC
+        """
+    ).fetchall()
+
+    return render_template("owner_notifications.html", notifications=notifications)
+
+@app.route("/owner/notifications/<int:notification_id>/read", methods=["POST"])
+@owner_required
+def owner_notification_read(notification_id):
+    db = get_db()
+    notification = db.execute(
+        "SELECT id FROM notifications WHERE id = %s",
+        (notification_id,)
+    ).fetchone()
+
+    if not notification:
+        abort(404)
+
+    db.execute(
+        "UPDATE notifications SET is_read = TRUE WHERE id = %s",
+        (notification_id,)
+    )
+    db.commit()
+
+    flash("通知を確認済みにしました。", "ok")
+    return redirect(url_for("owner_notifications"))
+
+@app.route("/owner/notifications/<int:notification_id>/delete", methods=["POST"])
+@owner_required
+def owner_notification_delete(notification_id):
+    db = get_db()
+    notification = db.execute(
+        "SELECT id FROM notifications WHERE id = %s",
+        (notification_id,)
+    ).fetchone()
+
+    if not notification:
+        abort(404)
+
+    db.execute(
+        "DELETE FROM notifications WHERE id = %s",
+        (notification_id,)
+    )
+    db.commit()
+
+    flash("通知を削除しました。", "ok")
+    return redirect(url_for("owner_notifications"))        
 
 if __name__ == "__main__":
     app.run(debug=True)

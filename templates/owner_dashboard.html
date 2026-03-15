@@ -10,6 +10,7 @@
     <div class="actions" style="display:flex; gap:12px; flex-wrap:wrap;">
       <a class="btn-primary" href="{{ url_for('owner_clients') }}">顧客管理</a>
       <a class="btn-primary" href="{{ url_for('owner_notices') }}">お知らせ管理</a>
+      <a class="btn-primary" href="{{ url_for('owner_notifications') }}">通知管理</a>
     </div>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
@@ -25,7 +26,14 @@
           <div style="font-size:28px; font-weight:700;">{{ notice_count }}</div>
         </div>
       </div>
+        <div class="card">
+          <div class="card-b">
+            <div class="muted">未確認通知</div>
+            <div style="font-size:28px; font-weight:700;">{{ notice_count }}</div>
+          </div>
+        </div>
     </div>
+    
 
     <div class="card">
       <div class="card-h">
