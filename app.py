@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_from_directory
 from functools import wraps
 from datetime import datetime, date, time
 from db import get_db, close_db, init_db
@@ -490,71 +490,49 @@ def mix_report():
     company = user.get("company", "")
     name = user.get("name", "")
 
-    subject = f"配合報告書依頼｜{project or '工事名未入力'}"
-    body = f"""配合報告書の依頼がありました。
+    photo_url = url_for("uploaded_file", filename=save_name)
 
-【依頼者】
-会社名：{company}
-氏名：{name}
+    notification_message = f"""会社名: {company}
+担当者: {name}
 
-【工事名】
-{project or '未入力'}
+工事名: {project or "未入力"}
+配合報告書の日付: {report_date}
+部数: {copies}部
 
-【配合報告書の日付】
-{report_date}
-
-【部数】
-{copies}部
-
-【配合】
+配合:
 {", ".join(unique_mixes)}
 
-【備考】
-{note or 'なし'}
+備考:
+{note or "なし"}
+
+添付写真:
+{photo_url}
 """
 
     try:
-        if not mail_settings_ready():
-            log_mail_config("MIX REPORT")
-            flash("メール設定が未完了です。管理者にご確認ください。", "error")
-            return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
+        print("=== MIX REPORT NOTIFICATION SAVE START ===")
+        print(notification_message)
 
-        log_mail_config("MIX REPORT BEFORE SEND")
-
-        msg = Message(
-            subject=subject,
-            recipients=[MAIL_TO],
-            body=body,
-            sender=MAIL_USERNAME
+        create_notification(
+            "mix_report",
+            title=f"配合報告書依頼: {company} {name}",
+            message=notification_message
         )
 
-        with app.open_resource(save_path) as fp:
-            file_data = fp.read()
-            print("attachment_bytes =", len(file_data))
-            msg.attach(
-                filename=save_name,
-                content_type=photo.content_type or "application/octet-stream",
-                data=file_data
-            )
-
-        print("=== MIX REPORT MAIL BUILD OK ===")
-        print("subject =", subject)
-        print("recipients =", [MAIL_TO])
-        print("sender =", MAIL_USERNAME)
-
-        mail.send(msg)
-
-        print("=== MIX REPORT MAIL SEND SUCCESS ===")
-        flash("配合報告書の依頼を送信しました。", "success")
+        print("=== MIX REPORT NOTIFICATION SAVE SUCCESS ===")
+        flash("配合報告書の依頼を受け付けました。", "ok")
         return redirect(url_for("dashboard"))
 
     except Exception as e:
-        print("=== MIX REPORT MAIL SEND ERROR ===")
+        print("=== MIX REPORT NOTIFICATION SAVE ERROR ===")
         print("error repr =", repr(e))
         traceback.print_exc()
-        flash("送信に失敗しました。メール設定をご確認ください。", "error")
+        flash("配合報告書依頼の受付に失敗しました。", "error")
         return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 @app.route("/price")
 @login_required

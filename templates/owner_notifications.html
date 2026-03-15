@@ -57,6 +57,18 @@
                 {% endif %}
                 {% endif %}
 
+                {% if n["type"] == "mix_report" and n["message"] and "添付写真:" in n["message"] %}
+                {% set photo_url = n["message"].split("添付写真:")[1].split("\n")[0].strip() %}
+                {% if photo_url %}
+                    <div style="margin-top:12px;">
+                    <a href="{{ photo_url }}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                        写真を開く
+                    </a>
+                    </div>
+                {% endif %}
+                {% endif %}
+
+                
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
                 {% if not n["is_read"] %}
                     <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
