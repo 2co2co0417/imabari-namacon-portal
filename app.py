@@ -225,32 +225,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/mail-test")
-def mail_test():
-    try:
-        print("=== MAIL TEST START ===")
-        log_mail_config("MAIL TEST")
-
-        if not mail_settings_ready():
-            return "メール設定不足"
-
-        msg = Message(
-            subject="送信テスト",
-            recipients=[MAIL_TO],
-            body="これは今治生コンポータルの送信テストです。",
-            sender=MAIL_USERNAME
-        )
-
-        print("MAIL TEST MESSAGE BUILD OK")
-        mail.send(msg)
-        print("MAIL TEST SEND SUCCESS")
-        return "メール送信成功"
-
-    except Exception as e:
-        print("=== MAIL TEST ERROR ===")
-        print("error repr =", repr(e))
-        traceback.print_exc()
-        return f"メール送信失敗: {repr(e)}"
 
 
 @app.route("/contact", methods=["GET", "POST"])
