@@ -909,6 +909,27 @@ def owner_notification_read(notification_id):
     flash("通知を確認済みにしました。", "ok")
     return redirect(url_for("owner_notifications"))
 
+@app.route("/owner/notifications/<int:notification_id>/unread", methods=["POST"])
+@owner_required
+def owner_notification_unread(notification_id):
+    db = get_db()
+    notification = db.execute(
+        "SELECT id FROM notifications WHERE id = %s",
+        (notification_id,)
+    ).fetchone()
+
+    if not notification:
+        abort(404)
+
+    db.execute(
+        "UPDATE notifications SET is_read = FALSE WHERE id = %s",
+        (notification_id,)
+    )
+    db.commit()
+
+    flash("通知を未確認に戻しました。", "ok")
+    return redirect(url_for("owner_notifications"))    
+
 @app.route("/owner/notifications/<int:notification_id>/delete", methods=["POST"])
 @owner_required
 def owner_notification_delete(notification_id):

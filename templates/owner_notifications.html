@@ -48,15 +48,19 @@
 
               <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
                 {% if not n["is_read"] %}
-                  <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
+                    <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
                     <button type="submit" class="btn-primary">確認済みにする</button>
-                  </form>
+                    </form>
+                {% else %}
+                    <form method="post" action="{{ url_for('owner_notification_unread', notification_id=n['id']) }}">
+                    <button type="submit" class="btn-ghost">未確認に戻す</button>
+                    </form>
                 {% endif %}
 
                 <form method="post" action="{{ url_for('owner_notification_delete', notification_id=n['id']) }}" onsubmit="return confirm('この通知を削除しますか？');">
-                  <button type="submit" class="btn-ghost">削除</button>
+                    <button type="submit" class="btn-ghost">削除</button>
                 </form>
-              </div>
+                </div> 
             </div>
           </div>
         {% endfor %}
