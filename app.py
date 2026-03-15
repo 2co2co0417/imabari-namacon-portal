@@ -467,21 +467,20 @@ def mix_report():
     photo_url = url_for("uploaded_file", filename=save_name)
 
     notification_message = f"""会社名: {company}
-担当者: {name}
+    担当者: {name}
 
-工事名: {project or "未入力"}
-配合報告書の日付: {report_date}
-部数: {copies}部
+    工事名: {project or "未入力"}
+    配合報告書の日付: {report_date}
+    部数: {copies}部
 
-配合:
-{", ".join(unique_mixes)}
+    配合:
+    {", ".join(unique_mixes)}
 
-備考:
-{note or "なし"}
+    備考:
+    {note or "なし"}
 
-添付写真:
-{photo_url}
-"""
+    添付写真: {photo_url}
+    """
 
     try:
         print("=== MIX REPORT NOTIFICATION SAVE START ===")
