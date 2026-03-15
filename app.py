@@ -67,7 +67,18 @@ def inject_notification_status():
         has_unread = False
 
     return dict(has_unread=has_unread)
-    
+
+def create_notification(notification_type, title="", message=""):
+    db = get_db()
+    db.execute(
+        """
+        INSERT INTO notifications (type, title, message)
+        VALUES (%s, %s, %s)
+        """,
+        (notification_type, title, message)
+    )
+    db.commit() 
+
 def log_mail_config(tag="MAIL"):
     print(f"=== {tag}: MAIL CONFIG CHECK ===")
     print("MAIL_SERVER =", app.config.get("MAIL_SERVER"))
@@ -261,56 +272,23 @@ def contact():
             flash("会社名・お名前・メールアドレス・お問い合わせ内容を入力してください。", "error")
             return redirect(url_for("contact"))
 
-        if not mail_settings_ready():
-            log_mail_config("CONTACT")
-            flash("メール設定が未完了です。管理者にご確認ください。", "error")
-            return redirect(url_for("contact"))
-
-        subject = f"【お問い合わせ】{company} {name}様"
-        body = f"""株式会社今治生コンのWebサイトからお問い合わせが届きました。
-
-【会社名】
-{company}
-
-【お名前】
-{name}様
-
-【メールアドレス】
-{email}
-
-【お問い合わせ内容】
-{message}
-"""
-
         try:
-            log_mail_config("CONTACT BEFORE SEND")
-
-            msg = Message(
-                subject=subject,
-                recipients=[MAIL_TO],
-                body=body,
-                sender=MAIL_USERNAME,
-                reply_to=email
+            create_notification(
+                "contact",
+                title=f"お問い合わせ: {company} {name}",
+                message=f"メール: {email}\n\n{message}"
             )
 
-            print("=== CONTACT MAIL BUILD OK ===")
-            print("subject =", subject)
-            print("recipients =", [MAIL_TO])
-            print("sender =", MAIL_USERNAME)
-            print("reply_to =", email)
-
-            mail.send(msg)
-
-            print("=== CONTACT MAIL SEND SUCCESS ===")
+            print("=== CONTACT SAVE SUCCESS ===")
             flash(f"お問い合わせを受け付けました。{name}様", "ok")
             return redirect(url_for("contact"))
 
         except BaseException as e:
-            print("=== CONTACT MAIL SEND ERROR ===")
+            print("=== CONTACT SAVE ERROR ===")
             print("error type =", type(e))
             print("error repr =", repr(e))
             traceback.print_exc()
-            flash("お問い合わせの送信に失敗しました。", "error")
+            flash("お問い合わせの受付に失敗しました。", "error")
             return redirect(url_for("contact"))
 
     return render_template("contact.html")
