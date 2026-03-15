@@ -857,3 +857,24 @@ footer{
 .notify-dot.green{
   background:#5bf563;
 }
+
+/* ===== スマホで日付入力がはみ出る対策 ===== */
+
+.form-mobile-form,
+.form-mobile-form *{
+  box-sizing: border-box;
+}
+
+.input,
+.stepper-input,
+input[type="date"],
+input[type="number"]{
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+input[type="date"]{
+  display: block;
+}
