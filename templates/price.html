@@ -45,6 +45,19 @@
           </div>
         </div>
 
+        <div style="margin-bottom:18px;">
+          <div class="field-label">割増要素</div>
+          <div class="btn-group" id="extraButtons">
+            <button type="button" data-v="4t">4t</button>
+            <button type="button" data-v="2t">2t</button>
+            <button type="button" data-v="pickup">引取</button>
+            <button type="button" data-v="tamagawa">玉川</button>
+          </div>
+          <div class="muted" style="margin-top:8px; font-size:.92rem;">
+            ※4t・2t・引取は同時選択不可／引取と玉川は同時選択不可
+          </div>
+        </div>
+
         <div id="priceResult" class="callout" style="margin-top:18px;">
           <div class="label">検索結果</div>
           <div class="muted" style="margin-top:6px;">
@@ -357,11 +370,20 @@
   let selectedSlump = 8;
   let selectedAgg = 20;
   let selectedCement = "N";
+  let selectedExtra = null;
+
+const extraPriceMap = {
+  "4t": 3000,
+  "2t": 4000,
+  "pickup": -1500,
+  "tamagawa": 200
+};
 
   const strengthButtonsEl = document.getElementById("strengthButtons");
   const slumpButtonsEl = document.getElementById("slumpButtons");
   const aggButtonsEl = document.getElementById("aggButtons");
   const cementButtonsEl = document.getElementById("cementButtons");
+  const extraButtonsEl = document.getElementById("extraButtons");
   const resultEl = document.getElementById("priceResult");
 
   function formatYen(value){
@@ -509,19 +531,41 @@
     let price = item.price;
 
     /* 15mm は 20mm ベース + 500円
-       早強Hでも同じルールで適用 */
+      早強Hでも同じルールで適用 */
     if (selectedAgg === 15) {
       price += 500;
     }
 
+    /* 割増要素を加算 */
+    if (selectedExtra && extraPriceMap[selectedExtra] !== undefined) {
+      price += extraPriceMap[selectedExtra];
+    }
+
     const mixName = buildMixName(selectedStrength, selectedSlump, selectedAgg, selectedCement);
 
-    let note = "※ N・BB は同じ単価です。";
+    let noteParts = [];
+
     if (selectedCement === "H") {
-      note = "※ H は早強単価表を使用し、15mmは20mm単価＋500円で計算しています。";
-    } else if (selectedAgg === 15) {
-      note = "※ 15mmは20mm単価＋500円です。";
+      noteParts.push("H は早強単価表を使用");
+    } else {
+      noteParts.push("N・BB は同じ単価");
     }
+
+    if (selectedAgg === 15) {
+      noteParts.push("15mmは20mm単価＋500円");
+    }
+
+    if (selectedExtra === "4t") {
+      noteParts.push("4t割増＋3,000円");
+    } else if (selectedExtra === "2t") {
+      noteParts.push("2t割増＋4,000円");
+    } else if (selectedExtra === "pickup") {
+      noteParts.push("引取 △1,500円");
+    } else if (selectedExtra === "tamagawa") {
+      noteParts.push("玉川割増＋200円");
+    }
+
+    let note = "※ " + noteParts.join("／") + "。";
 
     resultEl.innerHTML = `
       <div class="label">検索結果</div>
@@ -551,9 +595,39 @@
     }
   }
 
+  function renderExtraButtons(){
+    const buttons = extraButtonsEl.querySelectorAll("button");
+
+    buttons.forEach(btn => {
+      const value = btn.dataset.v;
+      btn.classList.toggle("active", value === selectedExtra);
+      btn.disabled = false;
+    });
+
+    const btn4t = extraButtonsEl.querySelector('[data-v="4t"]');
+    const btn2t = extraButtonsEl.querySelector('[data-v="2t"]');
+    const btnPickup = extraButtonsEl.querySelector('[data-v="pickup"]');
+    const btnTamagawa = extraButtonsEl.querySelector('[data-v="tamagawa"]');
+
+    if (selectedExtra === "4t") {
+      btn2t.disabled = true;
+      btnPickup.disabled = true;
+    } else if (selectedExtra === "2t") {
+      btn4t.disabled = true;
+      btnPickup.disabled = true;
+    } else if (selectedExtra === "pickup") {
+      btn4t.disabled = true;
+      btn2t.disabled = true;
+      btnTamagawa.disabled = true;
+    } else if (selectedExtra === "tamagawa") {
+      btnPickup.disabled = true;
+    }
+  }
+
   function refreshUI(){
     setActiveButton(aggButtonsEl, selectedAgg);
     setActiveButton(cementButtonsEl, selectedCement);
+    renderExtraButtons();
     renderStrengthButtons();
     renderSlumpButtons();
     searchPrice();
@@ -597,6 +671,20 @@
     resetToSafeDefaultIfNeeded();
     refreshUI();
   });
+  extraButtonsEl.addEventListener("click", (e) => {
+  if (e.target.tagName !== "BUTTON") return;
+  if (e.target.disabled) return;
+
+  const value = e.target.dataset.v;
+
+  if (selectedExtra === value) {
+    selectedExtra = null;
+  } else {
+    selectedExtra = value;
+  }
+
+  refreshUI();
+});
 
   const normalPdfUrl = "{{ url_for('static', filename='pdf/price_list_2026.pdf') }}";
   const earlyPdfUrl = "{{ url_for('static', filename='pdf/early_strength_price_list.pdf') }}";
