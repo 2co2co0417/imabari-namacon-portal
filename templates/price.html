@@ -370,13 +370,14 @@
   let selectedSlump = 8;
   let selectedAgg = 20;
   let selectedCement = "N";
-  let selectedExtra = null;
+  let selectedTransportExtra = null; // "4t" | "2t" | "pickup" | null
+  let selectedAreaExtra = null;      // "tamagawa" | null
 
-const extraPriceMap = {
-  "4t": 3000,
-  "2t": 4000,
-  "pickup": -1500,
-  "tamagawa": 200
+  const extraPriceMap = {
+    "4t": 3000,
+    "2t": 4000,
+    "pickup": -1500,
+    "tamagawa": 200
 };
 
   const strengthButtonsEl = document.getElementById("strengthButtons");
@@ -537,10 +538,13 @@ const extraPriceMap = {
     }
 
     /* 割増要素を加算 */
-    if (selectedExtra && extraPriceMap[selectedExtra] !== undefined) {
-      price += extraPriceMap[selectedExtra];
+    if (selectedTransportExtra && extraPriceMap[selectedTransportExtra] !== undefined) {
+      price += extraPriceMap[selectedTransportExtra];
     }
 
+    if (selectedAreaExtra && extraPriceMap[selectedAreaExtra] !== undefined) {
+      price += extraPriceMap[selectedAreaExtra];
+    }
     const mixName = buildMixName(selectedStrength, selectedSlump, selectedAgg, selectedCement);
 
     let noteParts = [];
@@ -555,13 +559,15 @@ const extraPriceMap = {
       noteParts.push("15mmは20mm単価＋500円");
     }
 
-    if (selectedExtra === "4t") {
+    if (selectedTransportExtra === "4t") {
       noteParts.push("4t割増＋3,000円");
-    } else if (selectedExtra === "2t") {
+    } else if (selectedTransportExtra === "2t") {
       noteParts.push("2t割増＋4,000円");
-    } else if (selectedExtra === "pickup") {
+    } else if (selectedTransportExtra === "pickup") {
       noteParts.push("引取 △1,500円");
-    } else if (selectedExtra === "tamagawa") {
+    }
+
+    if (selectedAreaExtra === "tamagawa") {
       noteParts.push("玉川割増＋200円");
     }
 
@@ -600,7 +606,7 @@ const extraPriceMap = {
 
     buttons.forEach(btn => {
       const value = btn.dataset.v;
-      btn.classList.toggle("active", value === selectedExtra);
+      btn.classList.remove("active");
       btn.disabled = false;
     });
 
@@ -609,18 +615,31 @@ const extraPriceMap = {
     const btnPickup = extraButtonsEl.querySelector('[data-v="pickup"]');
     const btnTamagawa = extraButtonsEl.querySelector('[data-v="tamagawa"]');
 
-    if (selectedExtra === "4t") {
+    if (selectedTransportExtra === "4t") {
+      btn4t.classList.add("active");
       btn2t.disabled = true;
       btnPickup.disabled = true;
-    } else if (selectedExtra === "2t") {
+    } else if (selectedTransportExtra === "2t") {
+      btn2t.classList.add("active");
       btn4t.disabled = true;
       btnPickup.disabled = true;
-    } else if (selectedExtra === "pickup") {
+    } else if (selectedTransportExtra === "pickup") {
+      btnPickup.classList.add("active");
       btn4t.disabled = true;
       btn2t.disabled = true;
       btnTamagawa.disabled = true;
-    } else if (selectedExtra === "tamagawa") {
-      btnPickup.disabled = true;
+    }
+
+    if (selectedAreaExtra === "tamagawa") {
+      btnTamagawa.classList.add("active");
+    }
+
+    if (selectedTransportExtra === "pickup") {
+      btnTamagawa.disabled = true;
+    }
+
+    if (selectedAreaExtra === "tamagawa" && selectedTransportExtra === "pickup") {
+      selectedAreaExtra = null;
     }
   }
 
@@ -672,19 +691,37 @@ const extraPriceMap = {
     refreshUI();
   });
   extraButtonsEl.addEventListener("click", (e) => {
-  if (e.target.tagName !== "BUTTON") return;
-  if (e.target.disabled) return;
+    if (e.target.tagName !== "BUTTON") return;
+    if (e.target.disabled) return;
 
-  const value = e.target.dataset.v;
+    const value = e.target.dataset.v;
 
-  if (selectedExtra === value) {
-    selectedExtra = null;
-  } else {
-    selectedExtra = value;
-  }
+    if (value === "4t" || value === "2t" || value === "pickup") {
+      if (selectedTransportExtra === value) {
+        selectedTransportExtra = null;
+      } else {
+        selectedTransportExtra = value;
 
-  refreshUI();
-});
+        if (value === "pickup") {
+          selectedAreaExtra = null; // 引取と玉川は同時不可
+        }
+      }
+    }
+
+    if (value === "tamagawa") {
+      if (selectedTransportExtra === "pickup") {
+        return;
+      }
+
+      if (selectedAreaExtra === "tamagawa") {
+        selectedAreaExtra = null;
+      } else {
+        selectedAreaExtra = "tamagawa";
+      }
+    }
+
+    refreshUI();
+  });
 
   const normalPdfUrl = "{{ url_for('static', filename='pdf/price_list_2026.pdf') }}";
   const earlyPdfUrl = "{{ url_for('static', filename='pdf/early_strength_price_list.pdf') }}";
