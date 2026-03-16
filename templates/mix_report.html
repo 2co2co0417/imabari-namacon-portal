@@ -7,7 +7,7 @@
     <h1 class="hero-title">配合報告書を依頼</h1>
   </div>
 
-  <div class="card-b" style="max-width:760px; margin:0 auto;">
+  <div class="card-b report-request-wrap">
     <div class="callout" style="margin-bottom:16px;">
       <div class="label">スマホ用入力</div>
       <div class="muted" style="margin-top:6px;">
@@ -17,29 +17,52 @@
 
     <form method="post" enctype="multipart/form-data" class="form mobile-form">
       <!-- 写真 -->
-      <label class="label" for="photo">契約書の写真 <span style="color:#b42318;">*</span></label>
-      <input
-        id="photo"
-        class="input"
-        type="file"
-        name="photo"
-        accept="image/*"
-        capture="environment"
-        required
-      >
+      <label class="label" style="margin-bottom:8px;">契約書の写真 <span style="color:#b42318;">*</span></label>
+
+      <div class="photo-actions">
+        <label for="photo_camera" class="btn-file-action">
+          📷 カメラで撮る
+        </label>
+        <input
+          id="photo_camera"
+          type="file"
+          name="photo"
+          accept="image/*"
+          capture="environment"
+          class="sr-only"
+        >
+
+        <label for="photo_library" class="btn-file-action btn-file-sub">
+          画像を選ぶ
+        </label>
+        <input
+          id="photo_library"
+          type="file"
+          name="photo"
+          accept="image/*"
+          class="sr-only"
+        >
+      </div>
+
+      <div id="photo-filename" class="input file-name-box">
+        まだ選択されていません
+      </div>
+
       <div class="muted form-help">
         スマホではカメラ起動、または写真選択ができます。
       </div>
 
       <!-- 日付 -->
       <label class="label" for="report_date" style="margin-top:14px;">配合報告書の日付</label>
-      <input
-        id="report_date"
-        class="input"
-        type="date"
-        name="report_date"
-        value="{{ today }}"
-      >
+      <div class="date-wrap">
+        <input
+          id="report_date"
+          class="input date-input-fix"
+          type="date"
+          name="report_date"
+          value="{{ today }}"
+        >
+      </div>
 
       <!-- 部数 -->
       <label class="label" for="copies" style="margin-top:14px;">部数</label>
@@ -131,6 +154,50 @@ document.addEventListener("DOMContentLoaded", function () {
     let value = parseInt(copiesInput.value || "2", 10);
     value = value + 1;
     copiesInput.value = value;
+  });
+
+  const photoCamera = document.getElementById("photo_camera");
+  const photoLibrary = document.getElementById("photo_library");
+  const photoFilename = document.getElementById("photo-filename");
+  const form = document.querySelector(".mobile-form");
+
+  function updatePhotoName(file) {
+    if (file) {
+      photoFilename.textContent = file.name;
+    } else {
+      photoFilename.textContent = "まだ選択されていません";
+    }
+  }
+
+  photoCamera.addEventListener("change", function () {
+    if (photoCamera.files && photoCamera.files.length > 0) {
+      photoLibrary.value = "";
+      updatePhotoName(photoCamera.files[0]);
+    }
+  });
+
+  photoLibrary.addEventListener("change", function () {
+    if (photoLibrary.files && photoLibrary.files.length > 0) {
+      photoCamera.value = "";
+      updatePhotoName(photoLibrary.files[0]);
+    }
+  });
+
+  form.addEventListener("submit", function (e) {
+    const hasCamera = photoCamera.files && photoCamera.files.length > 0;
+    const hasLibrary = photoLibrary.files && photoLibrary.files.length > 0;
+
+    if (!hasCamera && !hasLibrary) {
+      e.preventDefault();
+      alert("契約書の写真を選択してください。");
+      return;
+    }
+
+    if (hasCamera && !hasLibrary) {
+      const dt = new DataTransfer();
+      dt.items.add(photoCamera.files[0]);
+      photoLibrary.files = dt.files;
+    }
   });
 });
 </script>

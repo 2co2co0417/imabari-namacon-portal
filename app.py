@@ -42,7 +42,7 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 mail = Mail(app)
 
 MIX_OPTIONS = [
-    "24-8-20BB", "24-8-40BB", "24-12-20BB", "30-18-20BB",
+    "24-8-20BB", "24-8-40BB", "24-12-20BB", "27-12-20BB","30-18-20BB",
     "18-18-20N", "21-15-20N", "24-15-20N", "27-15-20N", "27-18-20N", "30-18-20N"
 ]
 
