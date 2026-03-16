@@ -46,7 +46,7 @@
         </div>
 
         <div style="margin-bottom:18px;">
-          <div class="field-label">割増要素</div>
+          <div class="field-label">割増</div>
           <div class="btn-group" id="extraButtons">
             <button type="button" data-v="4t">4t</button>
             <button type="button" data-v="2t">2t</button>
@@ -602,44 +602,31 @@
   }
 
   function renderExtraButtons(){
-    const buttons = extraButtonsEl.querySelectorAll("button");
-
-    buttons.forEach(btn => {
-      const value = btn.dataset.v;
-      btn.classList.remove("active");
-      btn.disabled = false;
-    });
-
     const btn4t = extraButtonsEl.querySelector('[data-v="4t"]');
     const btn2t = extraButtonsEl.querySelector('[data-v="2t"]');
     const btnPickup = extraButtonsEl.querySelector('[data-v="pickup"]');
     const btnTamagawa = extraButtonsEl.querySelector('[data-v="tamagawa"]');
 
+    [btn4t, btn2t, btnPickup, btnTamagawa].forEach(btn => {
+      btn.classList.remove("active");
+      btn.disabled = false;
+    });
+
     if (selectedTransportExtra === "4t") {
       btn4t.classList.add("active");
-      btn2t.disabled = true;
-      btnPickup.disabled = true;
     } else if (selectedTransportExtra === "2t") {
       btn2t.classList.add("active");
-      btn4t.disabled = true;
-      btnPickup.disabled = true;
     } else if (selectedTransportExtra === "pickup") {
       btnPickup.classList.add("active");
-      btn4t.disabled = true;
-      btn2t.disabled = true;
-      btnTamagawa.disabled = true;
     }
 
     if (selectedAreaExtra === "tamagawa") {
       btnTamagawa.classList.add("active");
     }
 
+    // 引取のときだけ玉川は押せない
     if (selectedTransportExtra === "pickup") {
       btnTamagawa.disabled = true;
-    }
-
-    if (selectedAreaExtra === "tamagawa" && selectedTransportExtra === "pickup") {
-      selectedAreaExtra = null;
     }
   }
 
@@ -690,24 +677,33 @@
     resetToSafeDefaultIfNeeded();
     refreshUI();
   });
+
   extraButtonsEl.addEventListener("click", (e) => {
     if (e.target.tagName !== "BUTTON") return;
     if (e.target.disabled) return;
 
     const value = e.target.dataset.v;
 
+    // 運搬系：4t / 2t / 引取
     if (value === "4t" || value === "2t" || value === "pickup") {
       if (selectedTransportExtra === value) {
+        // 同じものを押したら解除
         selectedTransportExtra = null;
       } else {
+        // 別のものを押したら即切替
         selectedTransportExtra = value;
-
-        if (value === "pickup") {
-          selectedAreaExtra = null; // 引取と玉川は同時不可
-        }
       }
+
+      // 引取と玉川は同時不可
+      if (selectedTransportExtra === "pickup") {
+        selectedAreaExtra = null;
+      }
+
+      refreshUI();
+      return;
     }
 
+    // 地域系：玉川だけON/OFF
     if (value === "tamagawa") {
       if (selectedTransportExtra === "pickup") {
         return;
@@ -718,9 +714,9 @@
       } else {
         selectedAreaExtra = "tamagawa";
       }
-    }
 
-    refreshUI();
+      refreshUI();
+    }
   });
 
   const normalPdfUrl = "{{ url_for('static', filename='pdf/price_list_2026.pdf') }}";
