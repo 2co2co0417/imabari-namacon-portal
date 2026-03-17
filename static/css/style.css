@@ -1013,3 +1013,10 @@ input[type="date"]{
     padding-right: 40px;
   }
 }
+/* 公開トップのボタン幅を統一 */
+.public-top-btn{
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
