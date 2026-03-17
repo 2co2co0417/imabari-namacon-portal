@@ -1013,10 +1013,18 @@ input[type="date"]{
     padding-right: 40px;
   }
 }
-/* 公開トップのボタン幅を統一 */
-.public-top-btn{
+
+/* 公開トップを業務メニューと同じ幅感に寄せる */
+.public-menu-list{
+  display: grid;
+  gap: 14px;
+}
+
+.public-menu-item{
   display: block;
   width: 100%;
   box-sizing: border-box;
+  padding: 18px 20px;
+  border-radius: 18px;
   text-align: center;
 }
