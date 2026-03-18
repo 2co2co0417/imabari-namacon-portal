@@ -650,62 +650,6 @@ body{
   padding:0 12px;
 }
 
-.mix-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-
-.mix-chip{
-  position:relative;
-  display:block;
-  cursor:pointer;
-}
-
-.mix-chip input[type="checkbox"]{
-  position:absolute;
-  opacity:0;
-  pointer-events:none;
-}
-
-.mix-chip span{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  min-height:52px;
-  padding:12px 14px;
-  border:1px solid var(--gray-200);
-  border-radius:12px;
-  background:#fff;
-  color:var(--dark-700);
-  font-weight:700;
-  line-height:1.35;
-  word-break:break-word;
-  transition:all .15s ease;
-  user-select:none;
-  box-shadow:0 2px 6px rgba(16,24,40,.04);
-}
-
-.mix-chip input[type="checkbox"]:checked + span{
-  background:var(--mint-500);
-  border-color:var(--mint-500);
-  color:#fff;
-  box-shadow:0 8px 18px rgba(59,170,156,.22);
-}
-
-.mix-chip span:active{
-  transform:translateY(1px);
-}
-
-.mobile-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
-
 /* =========================
    価格表ボタン
    ========================= */
@@ -810,10 +754,6 @@ footer{
     padding:16px !important;
   }
 
-  .mix-grid{
-    grid-template-columns:1fr;
-  }
-
   .input,
   .textarea,
   .btn-primary,
@@ -824,12 +764,6 @@ footer{
   .mobile-actions{
     display:grid;
     grid-template-columns:1fr;
-  }
-
-  .mix-chip span{
-    min-height:56px;
-    padding:14px;
-    font-size:15px;
   }
 
   .stepper{
@@ -859,7 +793,6 @@ footer{
 }
 
 /* ===== スマホで日付入力がはみ出る対策 ===== */
-
 .input,
 .stepper-input,
 input[type="date"],
@@ -949,7 +882,9 @@ input[type="date"]{
   line-height: 1.2;
 }
 
-/* 配合ボタン */
+/* =========================
+   配合ボタン
+   ========================= */
 .mix-grid{
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -991,7 +926,6 @@ input[type="date"]{
   box-shadow: inset 0 0 0 1px var(--mint-500);
 }
 
-/* スマホ */
 @media (max-width: 767px){
   .photo-actions{
     grid-template-columns: 1fr 1fr;
@@ -1014,31 +948,9 @@ input[type="date"]{
   }
 }
 
-/* 公開トップを業務メニューと同じ幅感に寄せる */
-.public-menu-list{
-  display: grid;
-  gap: 14px;
-}
-
-.public-menu-item{
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 18px 20px;
-  border-radius: 18px;
-  text-align: center;
-}
-.sidebar-btn-wrap{
-  margin-top: 12px;
-}
-
-.sidebar-btn{
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  text-align: center;
-}
-/* 公開トップだけ左カラムの見え方を整える */
+/* =========================
+   公開トップ専用
+   ========================= */
 .public-top-btn{
   display: block;
   width: 100%;
@@ -1055,7 +967,6 @@ input[type="date"]{
   text-align: center;
 }
 
-/* スマホ時、公開トップ左の内側カードの余白を少し詰める */
 @media (max-width: 768px){
   .grid > .card .inner-card .card-b{
     padding: 16px;
