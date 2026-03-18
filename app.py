@@ -520,6 +520,45 @@ def uploaded_file(filename):
 def price():
     return render_template("price.html")
 
+@app.route("/client/contact", methods=["GET", "POST"])
+@login_required
+def client_contact():
+    user = session.get("user", {})
+
+    if request.method == "POST":
+        company = request.form.get("company", "").strip()
+        name = request.form.get("name", "").strip()
+        contact = request.form.get("contact", "").strip()
+        message = request.form.get("message", "").strip()
+
+        if not message:
+            flash("内容を入力してください", "error")
+            return redirect(url_for("client_contact"))
+
+        msg = Message(
+            subject="【得意先お問い合わせ】",
+            recipients=[MAIL_TO],
+            body=f"""
+会社名：{company}
+担当者：{name}
+連絡先：{contact}
+
+内容：
+{message}
+""",
+            sender=MAIL_USERNAME
+        )
+        mail.send(msg)
+
+        flash("送信しました", "ok")
+        return redirect(url_for("client_contact"))
+
+    return render_template(
+        "contact_client.html",
+        company=user.get("company", ""),
+        name=user.get("name", ""),
+        contact=user.get("phone", "")
+    )
 
 @app.route("/news")
 def news_list():

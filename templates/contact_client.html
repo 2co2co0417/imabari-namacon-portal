@@ -1,0 +1,32 @@
+{% extends "base_private.html" %}
+{% block title %}お問い合わせ{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-h">
+    <h1 class="hero-title">お問い合わせ</h1>
+  </div>
+
+  <div class="card-b">
+
+    <form method="post" class="form">
+
+      <label>会社名</label>
+      <input type="text" name="company" value="{{ company }}">
+
+      <label>担当者名</label>
+      <input type="text" name="name" value="{{ name }}">
+
+      <label>連絡先</label>
+      <input type="text" name="contact" value="{{ contact }}">
+
+      <label>内容（必須）</label>
+      <textarea name="message" required></textarea>
+
+      <button class="btn-primary">送信する</button>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
