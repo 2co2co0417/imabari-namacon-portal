@@ -18,6 +18,13 @@ app = Flask(
 )
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
+from datetime import timedelta
+
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = True   # RenderならOK
+
 MAIL_USERNAME = os.getenv("MAIL_USERNAME", "").strip()
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "").strip()
 MAIL_TO = os.getenv("MAIL_TO", "2co2co0417@gmail.com").strip()
@@ -285,6 +292,7 @@ def login():
         ).fetchone()
 
         if user:
+            session.permanent = True
             session["user"] = {
                 "id": user["id"],
                 "company": user["company"],
@@ -301,7 +309,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
+    session.clear()
     return redirect(url_for("index"))
 
 
@@ -533,6 +541,7 @@ def owner_login():
         password = request.form.get("password", "").strip()
 
         if username == OWNER_USERNAME and password == OWNER_PASSWORD:
+            session.permanent = True
             session["owner_user"] = username
             flash("管理画面にログインしました。", "ok")
             return redirect(url_for("owner_dashboard"))
