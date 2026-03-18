@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_from_directory
 from functools import wraps
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta, timezone
 from db import get_db, close_db, init_db
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
@@ -189,7 +189,7 @@ def is_company_holiday(today):
 
 
 def get_business_status():
-    now = datetime.now()
+    now = datetime.now(timezone.utc) + timedelta(hours=9)
     today = now.date()
     current_time = now.time()
 
@@ -210,7 +210,7 @@ def get_business_status():
 
 @app.context_processor
 def inject_common():
-    now = datetime.now()
+    now = datetime.now(timezone.utc) + timedelta(hours=9)
     return {
         "business_status": get_business_status(),
         "order_phone": ORDER_PHONE,
