@@ -1038,3 +1038,30 @@ input[type="date"]{
   box-sizing: border-box;
   text-align: center;
 }
+/* 公開トップだけ左カラムの見え方を整える */
+.public-top-btn{
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.public-btn-wrap{
+  margin-top: 12px;
+}
+
+.public-note{
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* スマホ時、公開トップ左の内側カードの余白を少し詰める */
+@media (max-width: 768px){
+  .grid > .card .inner-card .card-b{
+    padding: 16px;
+  }
+
+  .grid > .card .inner-card .card-h{
+    padding: 14px 16px;
+  }
+}
