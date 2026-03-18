@@ -1028,3 +1028,13 @@ input[type="date"]{
   border-radius: 18px;
   text-align: center;
 }
+.sidebar-btn-wrap{
+  margin-top: 12px;
+}
+
+.sidebar-btn{
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
