@@ -958,8 +958,44 @@ input[type="date"]{
   text-align: center;
 }
 
+/* =========================
+   公開トップ専用
+   ========================= */
+.public-sections{
+  display: grid;
+  gap: 20px;
+}
+
+.public-section{
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  padding: 20px;
+  background: #fff;
+}
+
+.public-section-title{
+  margin: 0 0 16px;
+  color: var(--dark-800);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+
+.public-login{
+  text-align: center;
+}
+
+.public-top-btn{
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  text-align: center;
+}
+
 .public-btn-wrap{
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .public-note{
@@ -968,12 +1004,21 @@ input[type="date"]{
 }
 
 @media (max-width: 768px){
-  .grid > .card .inner-card .card-b{
+  .public-sections{
+    gap: 16px;
+  }
+
+  .public-section{
     padding: 16px;
   }
 
-  .grid > .card .inner-card .card-h{
-    padding: 14px 16px;
+  .public-section-title{
+    margin-bottom: 14px;
+    font-size: 18px;
+  }
+
+  .public-btn-wrap{
+    margin-top: 12px;
   }
 }
 /* 左カラムの中のカード幅を統一 */
