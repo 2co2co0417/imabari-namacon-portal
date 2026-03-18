@@ -976,3 +976,24 @@ input[type="date"]{
     padding: 14px 16px;
   }
 }
+/* 左カラムの中のカード幅を統一 */
+.grid > .card .inner-card{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ボタンの最大幅を制御（業務メニューと揃える） */
+.public-top-btn{
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+右カラムと視覚的な幅基準がズレています。
+
+→ これが「揃ってない感」の正体です
+/* サイドバーのボタンを統一 */
+.side .btn-ghost{
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+}
