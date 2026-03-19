@@ -1247,3 +1247,21 @@ textarea:focus {
   color: #1F4B45;
 }
 }
+/* お問い合わせだけ弱くする */
+.sub-actions {
+  margin-top: 16px;
+}
+
+.btn-sub {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #2F9488;
+  border: 1px solid #2F9488;
+
+  font-weight: 600;
+}
