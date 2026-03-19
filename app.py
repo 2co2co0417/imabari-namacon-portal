@@ -277,6 +277,9 @@ def contact():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if session.get("user"):
+        return redirect(url_for("dashboard"))
+
     if request.method == "POST":
         phone = request.form.get("phone", "").strip()
 
