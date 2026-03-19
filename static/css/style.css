@@ -1060,17 +1060,16 @@ textarea:focus {
   border-color: #3BAA9C;
   box-shadow: 0 0 0 3px rgba(59,170,156,0.15);
 }
-/* 割増ボタンはスマホでも1行4列固定 */
+/* 割増だけ1行固定、サイズは他ボタンに合わせる */
 #extraButtons{
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 
 #extraButtons button{
-  width: 100%;
-  min-width: 0;
-  padding: 12px 4px;
+  flex: 0 0 auto;
+  min-width: 72px;   /* 他のボタンに近い幅に調整 */
+  padding: 10px 14px;
   white-space: nowrap;
-  font-size: 0.95rem;
 }
