@@ -1117,55 +1117,100 @@ textarea:focus {
     border-radius: 14px;
   }
 
-  /* 割増だけは1行固定 */
-  #extraButtons{
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-  }
-
-  #extraButtons button{
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 10px 4px;
-  }
-
-  /* 注意書きの余白を縮める */
-  .muted{
-    margin-top: 6px !important;
-    font-size: 0.88rem !important;
-    line-height: 1.5;
-  }
-
-  /* 検索結果カードを上に近づける */
-  #priceResult{
-    margin-top: 12px !important;
-    padding: 14px 14px;
-  }
-
-  #priceResult .label{
-    margin-bottom: 6px;
-  }
-}
 @media (max-width: 480px){
+
+  /* 外側カード */
+  .card-h{
+    padding: 10px 12px !important;
+  }
+
+  .card-b{
+    padding: 10px 12px !important;
+  }
+
+  /* 内側カード */
   .card .card{
-    margin-bottom: 14px;
+    margin-bottom: 10px !important;
   }
 
   .card .card .card-h{
-    padding: 12px 14px;
+    padding: 10px 12px !important;
   }
 
   .card .card .card-b{
-    padding: 14px;
-  }
-}
-@media (max-width: 480px){
-  .hero-title{
-    font-size: 1.75rem;
+    padding: 10px 12px !important;
   }
 
+  /* タイトル */
+  .hero-title,
+  .card-h h1{
+    font-size: 1.55rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  /* 各項目ブロックの余白 */
+  #priceSearch > div[style*="margin-bottom:18px"]{
+    margin-bottom: 8px !important;
+  }
+
+  /* ラベル */
+  .field-label{
+    margin-bottom: 4px !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+  /* 通常ボタングループ */
+  .btn-group{
+    gap: 6px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .btn-group button{
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 6px 10px !important;
+    font-size: 0.95rem !important;
+    border-radius: 12px !important;
+    line-height: 1 !important;
+  }
+
+  /* 割増だけ1行固定 */
+  #extraButtons{
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+  }
+
+  #extraButtons button{
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 6px 4px !important;
+    font-size: 0.9rem !important;
+    border-radius: 12px !important;
+    line-height: 1 !important;
+  }
+
+  /* 注意書き */
+  .muted{
+    margin-top: 4px !important;
+    font-size: 0.78rem !important;
+    line-height: 1.35 !important;
+  }
+
+  /* 検索結果 */
   #priceResult{
+    margin-top: 8px !important;
+    padding: 10px 12px !important;
     scroll-margin-top: 80px;
+  }
+
+  #priceResult .label{
+    margin-bottom: 4px !important;
+    font-size: 0.95rem !important;
   }
 }
