@@ -1060,3 +1060,17 @@ textarea:focus {
   border-color: #3BAA9C;
   box-shadow: 0 0 0 3px rgba(59,170,156,0.15);
 }
+/* 割増ボタンはスマホでも1行4列固定 */
+#extraButtons{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#extraButtons button{
+  width: 100%;
+  min-width: 0;
+  padding: 12px 4px;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
