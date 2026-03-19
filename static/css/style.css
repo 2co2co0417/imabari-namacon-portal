@@ -1073,3 +1073,99 @@ textarea:focus {
   padding: 10px 14px;
   white-space: nowrap;
 }
+@media (max-width: 480px){
+
+  /* 全体カードの余白を圧縮 */
+  .card-b{
+    padding: 16px 14px;
+  }
+
+  .card-h{
+    padding: 14px 16px;
+  }
+
+  /* タイトルまわり */
+  .hero-title,
+  .card-h h1{
+    font-size: 1.9rem;
+    margin: 0;
+  }
+
+  /* 配合検索ブロック内の区切り余白 */
+  .field-label{
+    margin-bottom: 8px !important;
+    font-size: 0.98rem;
+    font-weight: 700;
+  }
+
+  /* 各項目のまとまりの下余白を減らす */
+  #priceSearch > div[style*="margin-bottom:18px"]{
+    margin-bottom: 14px !important;
+  }
+
+  /* ボタングループの間隔を少し詰める */
+  .btn-group{
+    gap: 8px !important;
+  }
+
+  /* ボタン自体を少しだけ低くする */
+  .btn-group button,
+  #extraButtons button{
+    min-height: 48px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: 14px;
+  }
+
+  /* 割増だけは1行固定 */
+  #extraButtons{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  #extraButtons button{
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 4px;
+  }
+
+  /* 注意書きの余白を縮める */
+  .muted{
+    margin-top: 6px !important;
+    font-size: 0.88rem !important;
+    line-height: 1.5;
+  }
+
+  /* 検索結果カードを上に近づける */
+  #priceResult{
+    margin-top: 12px !important;
+    padding: 14px 14px;
+  }
+
+  #priceResult .label{
+    margin-bottom: 6px;
+  }
+}
+@media (max-width: 480px){
+  .card .card{
+    margin-bottom: 14px;
+  }
+
+  .card .card .card-h{
+    padding: 12px 14px;
+  }
+
+  .card .card .card-b{
+    padding: 14px;
+  }
+}
+@media (max-width: 480px){
+  .hero-title{
+    font-size: 1.75rem;
+  }
+
+  #priceResult{
+    scroll-margin-top: 80px;
+  }
+}
