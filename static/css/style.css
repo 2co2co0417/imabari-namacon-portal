@@ -1033,9 +1033,6 @@ input[type="date"]{
   margin-left: auto;
   margin-right: auto;
 }
-右カラムと視覚的な幅基準がズレています。
-
-→ これが「揃ってない感」の正体です
 /* サイドバーのボタンを統一 */
 .side .btn-ghost{
   width: 100%;
@@ -1116,7 +1113,7 @@ textarea:focus {
     font-size: 0.95rem;
     border-radius: 14px;
   }
-
+}
 @media (max-width: 480px){
 
   /* 外側カード */
@@ -1246,7 +1243,6 @@ textarea:focus {
   letter-spacing: 0.08em;
   color: #000504;
 }
-}
 /* お問い合わせ（控えめ版） */
 .btn-sub {
   display: block;
@@ -1258,7 +1254,7 @@ textarea:focus {
   background: #EAF4F2; /* うっすらミント系 */
   color: #2F9488;
 
-  border: #0b0f0f;       /* 枠線なし */
+  border: 1px solid #0b0f0f;     /* 枠線なし */
   text-decoration: none; /* 下線なし */
 
   font-weight: 500;    /* 少し軽く */
