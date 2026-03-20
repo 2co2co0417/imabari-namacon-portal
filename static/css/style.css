@@ -1258,8 +1258,227 @@ textarea:focus {
   background: #EAF4F2; /* うっすらミント系 */
   color: #2F9488;
 
-  border: none;        /* 枠線なし */
+  border: #0b0f0f;       /* 枠線なし */
   text-decoration: none; /* 下線なし */
 
   font-weight: 500;    /* 少し軽く */
+}
+/* =========================
+   作業ツール型ハンバーガーメニュー
+   ========================= */
+
+.tool-menu{
+  margin-left: auto;
+}
+
+.menu-section{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-heading{
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: #667085;
+  padding: 2px 4px 6px;
+}
+
+.menu-divider{
+  height: 1px;
+  background: var(--gray-200);
+  margin: 8px 0;
+}
+
+.menu-btn,
+.menu-link{
+  text-decoration: none;
+  transition: .2s ease;
+}
+
+.menu-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  color: var(--dark-800);
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(16,24,40,.04);
+}
+
+.menu-btn:hover{
+  border-color: rgba(59,170,156,.35);
+  background: rgba(59,170,156,.06);
+}
+
+.menu-btn-call{
+  background: var(--mint-500);
+  border-color: var(--mint-500);
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(59,170,156,.22);
+}
+
+.menu-btn-call:hover{
+  background: var(--mint-600);
+  border-color: var(--mint-600);
+}
+
+.menu-btn-sub{
+  background: #EAF4F2;
+  color: #2F9488;
+  border: none;
+  box-shadow: none;
+  font-weight: 700;
+}
+
+.menu-btn-sub:hover{
+  background: #dff0ec;
+}
+
+.menu-link{
+  display: block;
+  padding: 10px 6px;
+  color: var(--dark-700);
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+.menu-link:hover{
+  background: rgba(59,170,156,.08);
+  padding-left: 10px;
+}
+
+.logout-link{
+  color: #b42318;
+}
+
+.menu-status{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-200);
+  font-size: 12px;
+  color: #667085;
+}
+
+/* ハンバーガーボタン */
+.menu-toggle{
+  display: none;
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 1px 2px rgba(16,24,40,.04);
+  transition: background-color .2s ease, border-color .2s ease, transform .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menu-toggle:hover{
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+}
+
+.menu-toggle:active{
+  transform: scale(0.98);
+}
+
+.menu-toggle:focus-visible{
+  outline: 2px solid var(--mint-500);
+  outline-offset: 2px;
+}
+
+.menu-toggle span{
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--dark-700);
+  border-radius: 2px;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+.menu-toggle[aria-expanded="true"] span:nth-child(1){
+  transform: translateY(7px) rotate(45deg);
+}
+
+.menu-toggle[aria-expanded="true"] span:nth-child(2){
+  opacity: 0;
+}
+
+.menu-toggle[aria-expanded="true"] span:nth-child(3){
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* PC */
+@media (min-width: 769px){
+  .tool-menu{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tool-menu .menu-section,
+  .tool-menu .menu-divider{
+    display: none;
+  }
+
+  .tool-menu .menu-status{
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
+/* スマホ */
+@media (max-width: 768px){
+  .menu-toggle{
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+
+  .tool-menu{
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 16px;
+    right: 16px;
+    margin-left: 0;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    z-index: 1200;
+  }
+
+  .tool-menu.open{
+    display: flex;
+  }
+
+  .menu-btn{
+    width: 100%;
+  }
+
+  .menu-link{
+    width: 100%;
+  }
 }
