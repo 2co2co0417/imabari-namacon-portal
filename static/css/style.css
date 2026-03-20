@@ -1255,8 +1255,8 @@ textarea:focus {
   padding: 14px;
   border-radius: 12px;
 
-  background: #EAF4F2; /* うっすらミント系 */
-  color: #2F9488;
+  background: #a0ebdc; /* うっすらミント系 */
+  color: #000707;
 
   border: none;        /* 枠線なし */
   text-decoration: none; /* 下線なし */
