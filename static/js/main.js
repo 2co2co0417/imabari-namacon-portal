@@ -24,15 +24,10 @@
     toggle.setAttribute('aria-expanded', 'true');
   }
 
-  function toggleMenu(){
-    const isOpen = nav.classList.contains('open');
-    if (isOpen) closeMenu();
-    else openMenu();
-  }
-
   toggle.addEventListener('click', function(e){
     e.stopPropagation();
-    toggleMenu();
+    if (nav.classList.contains('open')) closeMenu();
+    else openMenu();
   });
 
   document.addEventListener('click', function(e){
@@ -45,12 +40,6 @@
     link.addEventListener('click', function(){
       closeMenu();
     });
-  });
-
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape'){
-      closeMenu();
-    }
   });
 
   window.addEventListener('resize', function(){

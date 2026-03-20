@@ -2,8 +2,12 @@
 
 {% block title %}株式会社今治生コン{% endblock %}
 
+{% block brand_href %}{{ url_for('index') }}{% endblock %}
+
 {% block global_nav %}
-  <a href="{{ url_for('index') }}">公開トップ</a>
-  <a href="{{ url_for('login') }}">ログイン</a>
-  <a href="{{ url_for('contact') }}">お問い合わせ</a>
+  <div class="menu-section">
+    <a href="{{ url_for('index') }}" class="menu-link">公開トップ</a>
+    <a href="{{ url_for('login') }}" class="menu-link">ログイン</a>
+    <a href="{{ url_for('contact') }}" class="menu-link">お問い合わせ</a>
+  </div>
 {% endblock %}

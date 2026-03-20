@@ -2,9 +2,31 @@
 
 {% block title %}取引先専用｜株式会社今治生コン{% endblock %}
 
+{% block brand_href %}{{ url_for('dashboard') }}{% endblock %}
+
 {% block global_nav %}
-  <a href="{{ url_for('dashboard') }}">業務メニュー</a>
-  <a href="{{ url_for('news_list') }}">お知らせ</a>
-  <a href="{{ url_for('price') }}">価格表</a>
-  <a href="{{ url_for('logout') }}">ログアウト</a>
+  <div class="menu-section">
+    <div class="menu-heading">業務</div>
+
+    <a href="tel:{{ order_phone|replace('-', '') }}" class="menu-btn menu-btn-call">
+      ご注文専用電話
+    </a>
+    <a href="{{ url_for('map_send') }}" class="menu-btn">現場地図を送る</a>
+    <a href="{{ url_for('mix_report') }}" class="menu-btn">配合報告書を依頼</a>
+    <a href="{{ url_for('price') }}" class="menu-btn">価格表を見る</a>
+    <a href="{{ url_for('client_contact') }}" class="menu-btn menu-btn-sub">お問い合わせ</a>
+  </div>
+
+  <div class="menu-divider"></div>
+
+  <div class="menu-section">
+    <div class="menu-heading">情報</div>
+    <a href="{{ url_for('news_list') }}" class="menu-link">お知らせ</a>
+  </div>
+
+  <div class="menu-divider"></div>
+
+  <div class="menu-section">
+    <a href="{{ url_for('logout') }}" class="menu-link logout-link">ログアウト</a>
+  </div>
 {% endblock %}

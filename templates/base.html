@@ -9,13 +9,13 @@
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png') }}">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='6') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='7') }}">
 {% block head %}{% endblock %}
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a href="{{ url_for('dashboard') }}" class="brand">
+      <a href="{% block brand_href %}{{ url_for('index') }}{% endblock %}" class="brand">
         <div class="brand-text">
           <div class="company">株式会社今治生コン</div>
           <div class="service">imanama-portal</div>
@@ -35,33 +35,8 @@
         <span></span>
       </button>
 
-      <nav class="nav tool-menu" id="global-nav" aria-label="作業メニュー">
-        <div class="menu-section">
-          <div class="menu-heading">業務</div>
-
-          <a href="tel:0898XXXXXXXX" class="menu-btn menu-btn-call">ご注文専用電話</a>
-          <a href="{{ url_for('map_form') }}" class="menu-btn">現場地図を送る</a>
-          <a href="{{ url_for('report_request') }}" class="menu-btn">配合報告書を依頼</a>
-          <a href="{{ url_for('price') }}" class="menu-btn">価格表を見る</a>
-          <a href="{{ url_for('contact') }}" class="menu-btn menu-btn-sub">お問い合わせ</a>
-        </div>
-
-        <div class="menu-divider"></div>
-
-        <div class="menu-section">
-          <div class="menu-heading">情報</div>
-
-          <a href="{{ url_for('news_list') }}" class="menu-link">お知らせ</a>
-          <a href="{{ url_for('business_info') }}" class="menu-link">営業案内</a>
-          <a href="{{ url_for('delivery_area') }}" class="menu-link">配達エリア</a>
-          <a href="{{ url_for('truck_sizes') }}" class="menu-link">車両サイズ</a>
-        </div>
-
-        <div class="menu-divider"></div>
-
-        <div class="menu-section">
-          <a href="{{ url_for('logout') }}" class="menu-link logout-link">ログアウト</a>
-        </div>
+      <nav class="nav tool-menu" id="global-nav" aria-label="グローバルメニュー">
+        {% block global_nav %}{% endblock %}
 
         <div class="menu-status" title="営業状況">
           <span class="dot" aria-hidden="true"></span>
@@ -85,7 +60,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  <script src="{{ url_for('static', filename='js/main.js', v='6') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js', v='7') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

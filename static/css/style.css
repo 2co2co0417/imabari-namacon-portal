@@ -1263,6 +1263,7 @@ textarea:focus {
 
   font-weight: 500;    /* 少し軽く */
 }
+
 /* =========================
    作業ツール型ハンバーガーメニュー
    ========================= */
@@ -1425,27 +1426,51 @@ textarea:focus {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* PC */
+/* PC：通常の横並びナビとして表示 */
 @media (min-width: 769px){
   .tool-menu{
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
-  .tool-menu .menu-section,
+  .tool-menu .menu-section{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tool-menu .menu-heading,
   .tool-menu .menu-divider{
     display: none;
   }
 
+  .tool-menu .menu-btn{
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  .tool-menu .menu-link{
+    padding: 8px 10px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
   .tool-menu .menu-status{
     margin-top: 0;
+    margin-left: 6px;
     padding-top: 0;
     border-top: none;
+    white-space: nowrap;
   }
 }
 
-/* スマホ */
+/* スマホ：開閉式メニュー */
 @media (max-width: 768px){
   .menu-toggle{
     display: inline-flex;
@@ -1474,10 +1499,7 @@ textarea:focus {
     display: flex;
   }
 
-  .menu-btn{
-    width: 100%;
-  }
-
+  .menu-btn,
   .menu-link{
     width: 100%;
   }
