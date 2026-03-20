@@ -1265,13 +1265,14 @@ textarea:focus {
 }
 
 /* =========================
-   作業ツール型ハンバーガーメニュー
+   作業ツール型ハンバーガーメニュー（統一カラー版）
    ========================= */
 
 .tool-menu{
   margin-left: auto;
 }
 
+/* セクション構造 */
 .menu-section{
   display: flex;
   flex-direction: column;
@@ -1292,12 +1293,14 @@ textarea:focus {
   margin: 8px 0;
 }
 
+/* ボタン・リンク共通 */
 .menu-btn,
 .menu-link{
   text-decoration: none;
   transition: .2s ease;
 }
 
+/* ■ ボタン（完全統一カラー） */
 .menu-btn{
   display: flex;
   align-items: center;
@@ -1305,42 +1308,20 @@ textarea:focus {
   min-height: 48px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: #fff;
-  border: 1px solid var(--gray-200);
-  color: var(--dark-800);
-  font-weight: 800;
-  box-shadow: 0 1px 2px rgba(16,24,40,.04);
-}
 
-.menu-btn:hover{
-  border-color: rgba(59,170,156,.35);
-  background: rgba(59,170,156,.06);
-}
-
-.menu-btn-call{
-  background: var(--mint-500);
-  border-color: var(--mint-500);
-  color: #fff;
-  box-shadow: 0 10px 18px rgba(59,170,156,.22);
-}
-
-.menu-btn-call:hover{
-  background: var(--mint-600);
-  border-color: var(--mint-600);
-}
-
-.menu-btn-sub{
   background: #EAF4F2;
   color: #2F9488;
   border: none;
-  box-shadow: none;
+
   font-weight: 700;
+  box-shadow: none;
 }
 
-.menu-btn-sub:hover{
+.menu-btn:hover{
   background: #dff0ec;
 }
 
+/* ■ 情報リンク */
 .menu-link{
   display: block;
   padding: 10px 6px;
@@ -1355,10 +1336,12 @@ textarea:focus {
   padding-left: 10px;
 }
 
+/* ログアウト */
 .logout-link{
   color: #b42318;
 }
 
+/* 営業状況 */
 .menu-status{
   display: flex;
   align-items: center;
@@ -1371,7 +1354,10 @@ textarea:focus {
   color: #667085;
 }
 
-/* ハンバーガーボタン */
+/* =========================
+   ハンバーガーボタン
+   ========================= */
+
 .menu-toggle{
   display: none;
   margin-left: auto;
@@ -1382,10 +1368,13 @@ textarea:focus {
   background: #fff;
   cursor: pointer;
   padding: 0;
+
+  display: none;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 5px;
+
   box-shadow: 0 1px 2px rgba(16,24,40,.04);
   transition: background-color .2s ease, border-color .2s ease, transform .15s ease;
   -webkit-tap-highlight-color: transparent;
@@ -1426,7 +1415,10 @@ textarea:focus {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* PC：通常の横並びナビとして表示 */
+/* =========================
+   PC表示
+   ========================= */
+
 @media (min-width: 769px){
   .tool-menu{
     display: flex;
@@ -1470,7 +1462,10 @@ textarea:focus {
   }
 }
 
-/* スマホ：開閉式メニュー */
+/* =========================
+   スマホ表示
+   ========================= */
+
 @media (max-width: 768px){
   .menu-toggle{
     display: inline-flex;
@@ -1485,10 +1480,12 @@ textarea:focus {
     right: 16px;
     margin-left: 0;
     padding: 14px;
+
     background: #fff;
     border: 1px solid var(--gray-200);
     border-radius: 18px;
     box-shadow: var(--shadow);
+
     flex-direction: column;
     align-items: stretch;
     gap: 0;
