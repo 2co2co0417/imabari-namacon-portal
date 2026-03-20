@@ -6,8 +6,14 @@
 
 {% block global_nav %}
   <div class="menu-section">
-    <a href="{{ url_for('index') }}" class="menu-link">公開トップ</a>
+
     <a href="{{ url_for('login') }}" class="menu-link">ログイン</a>
+
+    <a href="{{ url_for('pre_order') }}" class="menu-link">注文前確認事項</a>
+
     <a href="{{ url_for('contact') }}" class="menu-link">お問い合わせ</a>
+
+    <a href="{{ url_for('news_list') }}" class="menu-link">お知らせ</a>
+
   </div>
 {% endblock %}
