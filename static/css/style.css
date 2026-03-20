@@ -1244,14 +1244,10 @@ textarea:focus {
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #1F4B45;
+  color: #000504;
 }
 }
-/* お問い合わせだけ弱くする */
-.sub-actions {
-  margin-top: 16px;
-}
-
+/* お問い合わせ（控えめ版） */
 .btn-sub {
   display: block;
   width: 100%;
@@ -1259,9 +1255,11 @@ textarea:focus {
   padding: 14px;
   border-radius: 12px;
 
-  background: #ffffff;
+  background: #EAF4F2; /* うっすらミント系 */
   color: #2F9488;
-  border: 1px solid #2F9488;
 
-  font-weight: 600;
+  border: none;        /* 枠線なし */
+  text-decoration: none; /* 下線なし */
+
+  font-weight: 500;    /* 少し軽く */
 }
