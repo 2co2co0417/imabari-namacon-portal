@@ -152,8 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   plusBtn.addEventListener("click", function () {
     let value = parseInt(copiesInput.value || "2", 10);
-    value = value + 1;
-    copiesInput.value = value;
+    copiesInput.value = value + 1;
   });
 
   const photoCamera = document.getElementById("photo_camera");
@@ -162,11 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector(".mobile-form");
 
   function updatePhotoName(file) {
-    if (file) {
-      photoFilename.textContent = file.name;
-    } else {
-      photoFilename.textContent = "まだ選択されていません";
-    }
+    photoFilename.textContent = file ? file.name : "まだ選択されていません";
   }
 
   photoCamera.addEventListener("change", function () {
@@ -190,13 +185,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!hasCamera && !hasLibrary) {
       e.preventDefault();
       alert("契約書の写真を選択してください。");
-      return;
-    }
-
-    if (hasCamera && !hasLibrary) {
-      const dt = new DataTransfer();
-      dt.items.add(photoCamera.files[0]);
-      photoLibrary.files = dt.files;
     }
   });
 });
