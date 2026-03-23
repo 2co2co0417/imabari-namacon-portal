@@ -417,7 +417,9 @@ def mix_report():
     selected_mixes = request.form.getlist("mixes")
     custom_mix = request.form.get("custom_mix", "").strip()
     note = request.form.get("note", "").strip()
-    photo = request.files.get("photo")
+    photo = request.files.get("photo_camera")
+    if not photo or photo.filename == "":
+        photo = request.files.get("photo_library")
 
     print("=== MIX REPORT POST START ===")
     print("project =", project)
