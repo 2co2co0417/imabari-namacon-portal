@@ -7,23 +7,46 @@
     <h1 class="hero-title">お問い合わせ</h1>
   </div>
 
-  <div class="card-b">
+  <div class="card-b" style="max-width:720px; margin:0 auto;">
 
-    <form method="post" class="form">
+    <form method="post" action="{{ url_for('client_contact') }}" class="form">
 
-      <label>会社名</label>
-      <input type="text" name="company" value="{{ company }}">
+      <label class="label">会社名</label>
+      <input
+        class="input"
+        type="text"
+        name="company"
+        value="{{ company }}"
+      >
 
-      <label>担当者名</label>
-      <input type="text" name="name" value="{{ name }}">
+      <label class="label" style="margin-top:12px;">担当者名</label>
+      <input
+        class="input"
+        type="text"
+        name="name"
+        value="{{ name }}"
+      >
 
-      <label>連絡先</label>
-      <input type="text" name="contact" value="{{ contact }}">
+      <label class="label" style="margin-top:12px;">連絡先</label>
+      <input
+        class="input"
+        type="text"
+        name="contact"
+        value="{{ contact }}"
+      >
 
-      <label>内容（必須）</label>
-      <textarea name="message" required></textarea>
+      <label class="label" style="margin-top:12px;">内容（必須）</label>
+      <textarea
+        class="textarea"
+        name="message"
+        rows="8"
+        placeholder="お問い合わせ内容をご記入ください"
+        required
+      ></textarea>
 
-      <button class="btn-primary">送信する</button>
+      <div style="margin-top:14px;">
+        <button class="btn-primary" type="submit">送信</button>
+      </div>
 
     </form>
 

@@ -536,26 +536,68 @@ def client_contact():
         contact = request.form.get("contact", "").strip()
         message = request.form.get("message", "").strip()
 
+        # 空ならログイン情報で補完
+        if not company:
+            company = user.get("company", "")
+        if not name:
+            name = user.get("name", "")
+        if not contact:
+            contact = user.get("phone", "")
+
         if not message:
             flash("内容を入力してください", "error")
             return redirect(url_for("client_contact"))
 
-        msg = Message(
-            subject="【得意先お問い合わせ】",
-            recipients=[MAIL_TO],
-            body=f"""
-会社名：{company}
-担当者：{name}
-連絡先：{contact}
+        # 管理画面表示用メッセージ
+        notify_title = f"得意先お問い合わせ：{company} {name}".strip()
+        notify_message = f"""会社名: {company}
+担当者: {name}
+連絡先: {contact}
 
-内容：
+内容:
 {message}
-""",
-            sender=MAIL_USERNAME
-        )
-        mail.send(msg)
+"""
 
-        flash("送信しました", "ok")
+        # 1) まず通知として保存（これが本体）
+        try:
+            db = get_db()
+            with db.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO notifications (type, title, message, is_read)
+                    VALUES (%s, %s, %s, FALSE)
+                    """,
+                    ("client_contact", notify_title, notify_message)
+                )
+            db.commit()
+
+        except Exception as e:
+            db.rollback()
+            print("=== client_contact notification save error ===")
+            print(repr(e))
+            traceback.print_exc()
+            flash("お問い合わせの保存に失敗しました。", "error")
+            return redirect(url_for("client_contact"))
+
+        # 2) メール送信は将来用：失敗しても止めない
+        try:
+            if MAIL_TO and MAIL_USERNAME:
+                msg = Message(
+                    subject="【得意先お問い合わせ】",
+                    recipients=[MAIL_TO],
+                    body=notify_message,
+                    sender=MAIL_USERNAME
+                )
+                mail.send(msg)
+
+        except Exception as e:
+            print("=== client_contact mail send skipped/error ===")
+            print(repr(e))
+            traceback.print_exc()
+            # ここでは flash しない
+            # DB保存できていれば、ユーザーには送信完了でよい
+
+        flash("お問い合わせを受け付けました。", "ok")
         return redirect(url_for("client_contact"))
 
     return render_template(
