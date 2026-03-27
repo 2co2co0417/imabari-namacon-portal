@@ -407,12 +407,12 @@ def mix_report():
     if request.method == "GET":
         return render_template(
             "mix_report.html",
-            today=date.today().isoformat(),
+            today=jst_today(),
             mix_options=MIX_OPTIONS
         )
 
     project = request.form.get("project", "").strip()
-    report_date = request.form.get("report_date", "").strip() or date.today().isoformat()
+    report_date = request.form.get("report_date", "").strip() or jst_today()
     copies = request.form.get("copies", "2").strip() or "2"
     selected_mixes = request.form.getlist("mixes")
     custom_mix = request.form.get("custom_mix", "").strip()
@@ -460,7 +460,7 @@ def mix_report():
         return render_template("mix_report.html", today=report_date, mix_options=MIX_OPTIONS)
 
     filename = secure_filename(photo.filename)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(JST).strftime("%Y%m%d_%H%M%S")
     save_name = f"{timestamp}_{filename}"
     save_path = os.path.join(app.config["UPLOAD_FOLDER"], save_name)
 
