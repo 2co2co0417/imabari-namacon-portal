@@ -11,14 +11,17 @@ import traceback
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
+JST = timezone(timedelta(hours=9))
+
+def jst_today():
+    return datetime.now(JST).date().isoformat()
+
 app = Flask(
     __name__,
     template_folder="templates",
     static_folder="static"
 )
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
-
-from datetime import timedelta
 
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
