@@ -1254,7 +1254,7 @@ textarea:focus {
   background: #EAF4F2; /* うっすらミント系 */
   color: #2F9488;
 
-  border: 1px solid #0b0f0f;     /* 枠線なし */
+  border: 1px solid #025e2b;     /* 枠線なし */
   text-decoration: none; /* 下線なし */
 
   font-weight: 500;    /* 少し軽く */
