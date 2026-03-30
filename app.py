@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_from_directory, make_response
 from functools import wraps
 from datetime import datetime, date, time, timedelta, timezone
 from db import get_db, close_db, init_db
@@ -234,7 +234,31 @@ def inject_common():
 def index():
     return render_template("index.html")
 
+@app.route("/sitemap.xml")
+def sitemap():
+    pages = []
 
+    pages.append({
+        "loc": "https://imanama.co.jp/",
+        "lastmod": datetime.now().date().isoformat()
+    })
+    pages.append({
+        "loc": "https://imanama.co.jp/contact",
+        "lastmod": datetime.now().date().isoformat()
+    })
+    pages.append({
+        "loc": "https://imanama.co.jp/news",
+        "lastmod": datetime.now().date().isoformat()
+    })
+    pages.append({
+        "loc": "https://imanama.co.jp/precheck",
+        "lastmod": datetime.now().date().isoformat()
+    })
+
+    xml = render_template("sitemap.xml", pages=pages)
+    response = make_response(xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 
 @app.route("/contact", methods=["GET", "POST"])
