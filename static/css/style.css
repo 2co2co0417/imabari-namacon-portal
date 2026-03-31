@@ -1243,21 +1243,27 @@ textarea:focus {
   letter-spacing: 0.08em;
   color: #000504;
 }
-/* お問い合わせ（控えめ版） */
-.btn-sub {
+/* サブボタン（注文前確認・お問い合わせ） */
+.btn-sub{
   display: block;
   width: 100%;
   text-align: center;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
 
-  background: #EAF4F2; /* うっすらミント系 */
-  color: #2F9488;
+  background: var(--mint-100);
+  color: var(--mint-600);
+  border: 1px solid rgba(59,170,156,.28);
+  text-decoration: none;
 
-  border: 1px solid #025e2b;     /* 枠線なし */
-  text-decoration: none; /* 下線なし */
+  font-weight: 700;
+  box-shadow: none;
+  transition: .2s ease;
+}
 
-  font-weight: 500;    /* 少し軽く */
+.btn-sub:hover{
+  background: #EAF4F2;
+  border-color: rgba(59,170,156,.4);
 }
 
 /* =========================
