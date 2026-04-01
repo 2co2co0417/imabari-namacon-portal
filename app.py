@@ -504,23 +504,23 @@ def mix_report():
     company = user.get("company", "")
     name = user.get("name", "")
 
-    photo_url = url_for("uploaded_file", filename=save_name)
+    photo_url = url_for("uploaded_file", filename=save_name, _external=True)
 
     notification_message = f"""会社名: {company}
-    担当者: {name}
+担当者: {name}
 
-    工事名: {project or "未入力"}
-    配合報告書の日付: {report_date}
-    部数: {copies}部
+工事名: {project or "未入力"}
+配合報告書の日付: {report_date}
+部数: {copies}部
 
-    配合:
-    {", ".join(unique_mixes)}
+配合:
+{", ".join(unique_mixes)}
 
-    備考:
-    {note or "なし"}
+備考:
+{note or "なし"}
 
-    添付写真: {photo_url}
-    """
+添付写真URL: {photo_url}
+"""
 
     try:
         print("=== MIX REPORT NOTIFICATION SAVE START ===")
@@ -531,6 +531,42 @@ def mix_report():
             title=f"配合報告書依頼: {company} {name}",
             message=notification_message
         )
+
+        if mail_settings_ready():
+            try:
+                log_mail_config("MIX_REPORT")
+
+                msg = Message(
+                    subject=f"配合報告書依頼: {company} {name}",
+                    recipients=[MAIL_TO],
+                    body=notification_message
+                )
+
+                with open(save_path, "rb") as f:
+                    data = f.read()
+
+                ext = filename.rsplit(".", 1)[-1].lower()
+                mime_map = {
+                    "jpg": "image/jpeg",
+                    "jpeg": "image/jpeg",
+                    "png": "image/png",
+                    "webp": "image/webp",
+                    "heic": "image/heic",
+                }
+
+                msg.attach(
+                    filename=filename,
+                    content_type=mime_map.get(ext, "application/octet-stream"),
+                    data=data
+                )
+
+                mail.send(msg)
+                print("=== MAIL SEND SUCCESS ===")
+
+            except Exception as e:
+                print("=== MAIL SEND ERROR ===")
+                print(repr(e))
+                traceback.print_exc()
 
         print("=== MIX REPORT NOTIFICATION SAVE SUCCESS ===")
         flash("配合報告書の依頼を受け付けました。", "ok")
