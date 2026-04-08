@@ -385,10 +385,12 @@ def map_send():
             lat_num = float(lat)
             lng_num = float(lng)
         except ValueError:
+            print("MAP VALIDATION ERROR: invalid lat/lng format")
             flash("緯度・経度の形式が正しくありません。", "error")
             return redirect(url_for("map_send"))
 
         if not (-90 <= lat_num <= 90) or not (-180 <= lng_num <= 180):
+            print("MAP VALIDATION ERROR: lat/lng out of range")
             flash("緯度・経度の範囲が正しくありません。", "error")
             return redirect(url_for("map_send"))
 
@@ -408,22 +410,46 @@ Googleマップ: {map_url}
 {comment if comment else "なし"}"""
 
         try:
+            print("=== MAP NOTIFICATION SAVE START ===")
+            print(notification_message)
+
             create_notification(
                 "map",
                 title=f"現場地図送信: {company} {name}",
                 message=notification_message
             )
 
-            print("=== MAP SAVE SUCCESS ===")
+            print("=== MAP NOTIFICATION SAVE SUCCESS ===")
+
+            if mail_settings_ready():
+                try:
+                    log_mail_config("MAP_SEND")
+
+                    msg = Message(
+                        subject=f"現場地図送信: {company} {name}",
+                        recipients=[MAIL_TO],
+                        body=notification_message
+                    )
+
+                    mail.send(msg)
+                    print("=== MAP MAIL SEND SUCCESS ===")
+
+                except Exception as e:
+                    print("=== MAP MAIL SEND ERROR ===")
+                    print(repr(e))
+                    traceback.print_exc()
+            else:
+                print("=== MAP MAIL SKIPPED: mail settings not ready ===")
+
             flash("現場地図を受け付けました。", "ok")
+            return redirect(url_for("dashboard"))
 
         except Exception as e:
             print("=== MAP SAVE ERROR ===")
             print("error repr =", repr(e))
             traceback.print_exc()
             flash("現場地図の受付に失敗しました。", "error")
-
-        return redirect(url_for("map_send"))
+            return redirect(url_for("map_send"))
 
     return render_template("map.html")
 
