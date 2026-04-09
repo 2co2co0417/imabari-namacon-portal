@@ -1529,6 +1529,6 @@ textarea:focus {
 
 .a2hs-modal__box h3 {
   margin: 0 0 12px;
-  font-size: 1.2rem;
+  font-size: calc(1rem + 2px);
   color: #123;
 }
