@@ -62,7 +62,64 @@
     {% block content %}{% endblock %}
   </main>
 
-  <script src="{{ url_for('static', filename='js/main.js', v='7') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js', v='7') }}"></script>
+
+  <!-- ホーム画面追加モーダル -->
+  <div id="addToHomeModal" class="a2hs-modal" aria-hidden="true">
+    <div class="a2hs-modal__backdrop" onclick="closeAddToHomeModal()"></div>
+    <div class="a2hs-modal__box" role="dialog" aria-modal="true" aria-labelledby="a2hs-title">
+      <h3 id="a2hs-title">ホーム画面に追加</h3>
+      <div id="a2hs-body" class="muted">読み込み中…</div>
+
+      <div class="public-btn-wrap" style="margin-top:16px;">
+        <button type="button" class="btn-sub public-top-btn" onclick="closeAddToHomeModal()">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openAddToHomeModal() {
+      const modal = document.getElementById("addToHomeModal");
+      const body = document.getElementById("a2hs-body");
+      const ua = navigator.userAgent.toLowerCase();
+
+      const isIphone = /iphone/.test(ua);
+      const isIpad = /ipad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const isIos = isIphone || isIpad;
+      const isAndroid = /android/.test(ua);
+
+      if (isIos) {
+        body.innerHTML = `
+          <strong>iPhone / iPad の場合</strong><br><br>
+          1. 画面下の共有ボタンを押してください<br>
+          2. 「ホーム画面に追加」を選んでください
+        `;
+      } else if (isAndroid) {
+        body.innerHTML = `
+          <strong>Android の場合</strong><br><br>
+          1. 画面右上の「︙」を押してください<br>
+          2. 「ホーム画面に追加」を選んでください
+        `;
+      } else {
+        body.innerHTML = `
+          この端末では、ブラウザのメニューから<br>
+          「ホーム画面に追加」を選んでください。
+        `;
+      }
+
+      modal.style.display = "block";
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeAddToHomeModal() {
+      const modal = document.getElementById("addToHomeModal");
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
+    }
+  </script>
+
   {% block scripts %}{% endblock %}
 </body>
 </html>
