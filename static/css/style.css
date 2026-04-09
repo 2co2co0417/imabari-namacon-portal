@@ -1534,6 +1534,6 @@ textarea:focus {
 }
 /* 「ホーム画面に追加」だけ補正 */
 .public-top-btn {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
 }
