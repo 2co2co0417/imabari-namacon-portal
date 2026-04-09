@@ -1529,6 +1529,11 @@ textarea:focus {
 
 .a2hs-modal__box h3 {
   margin: 0 0 12px;
-  font-size: 18px;
+  font-size: 20px;
   color: #123;
+}
+/* 「ホーム画面に追加」だけ補正 */
+.public-top-btn {
+  font-size: 20px;
+  font-weight: 700;
 }
