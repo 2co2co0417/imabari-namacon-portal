@@ -280,18 +280,28 @@ def contact():
             flash("会社名・お名前・メールアドレス・お問い合わせ内容を入力してください。", "error")
             return redirect(url_for("contact"))
 
+        notify_title = f"お問い合わせ: {company} {name}"
+        notify_message = f"""会社名: {company}
+お名前: {name}
+メール: {email}
+
+内容:
+{message}
+"""
+
         try:
+            print("=== CONTACT NOTIFICATION SAVE START ===")
+            print(notify_message)
+
             create_notification(
                 "contact",
-                title=f"お問い合わせ: {company} {name}",
-                message=f"メール: {email}\n\n{message}"
+                title=notify_title,
+                message=notify_message
             )
 
-            print("=== CONTACT SAVE SUCCESS ===")
-            flash(f"お問い合わせを受け付けました。{name}様", "ok")
-            return redirect(url_for("contact"))
+            print("=== CONTACT NOTIFICATION SAVE SUCCESS ===")
 
-        except BaseException as e:
+        except Exception as e:
             print("=== CONTACT SAVE ERROR ===")
             print("error type =", type(e))
             print("error repr =", repr(e))
@@ -299,8 +309,32 @@ def contact():
             flash("お問い合わせの受付に失敗しました。", "error")
             return redirect(url_for("contact"))
 
-    return render_template("contact.html")
+        if mail_settings_ready():
+            try:
+                print("=== CONTACT MAIL SEND START ===")
+                log_mail_config("CONTACT")
 
+                msg = Message(
+                    subject=notify_title,
+                    recipients=[MAIL_TO],
+                    body=notify_message
+                )
+
+                mail.send(msg)
+                print("=== CONTACT MAIL SEND SUCCESS ===")
+
+            except Exception as e:
+                print("=== CONTACT MAIL SEND ERROR ===")
+                print("error type =", type(e))
+                print("error repr =", repr(e))
+                traceback.print_exc()
+        else:
+            print("=== CONTACT MAIL SKIPPED: mail settings not ready ===")
+
+        flash(f"お問い合わせを受け付けました。{name}様", "ok")
+        return redirect(url_for("contact"))
+
+    return render_template("contact.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -625,6 +659,13 @@ def client_contact():
         contact = request.form.get("contact", "").strip()
         message = request.form.get("message", "").strip()
 
+        print("=== CLIENT CONTACT POST START ===")
+        print("company =", company)
+        print("name =", name)
+        print("contact =", contact)
+        print("message_exists =", bool(message))
+        print("session_user =", user)
+
         # 空ならログイン情報で補完
         if not company:
             company = user.get("company", "")
@@ -634,14 +675,17 @@ def client_contact():
             contact = user.get("phone", "")
 
         if not message:
+            print("CLIENT CONTACT VALIDATION ERROR: message missing")
             flash("内容を入力してください", "error")
             return redirect(url_for("client_contact"))
 
-        # 管理画面表示用メッセージ
+        # 件名を共通化
         notify_title = f"得意先お問い合わせ：{company} {name}".strip()
-        notify_message = f"""会社名: {company}
-担当者: {name}
-連絡先: {contact}
+
+        # 管理画面表示用メッセージ
+        notify_message = f"""会社名: {company or "未入力"}
+担当者: {name or "未入力"}
+連絡先: {contact or "未入力"}
 
 内容:
 {message}
@@ -649,6 +693,9 @@ def client_contact():
 
         # 1) まず通知として保存（これが本体）
         try:
+            print("=== CLIENT CONTACT NOTIFICATION SAVE START ===")
+            print(notify_message)
+
             db = get_db()
             with db.cursor() as cur:
                 cur.execute(
@@ -660,13 +707,37 @@ def client_contact():
                 )
             db.commit()
 
+            print("=== CLIENT CONTACT NOTIFICATION SAVE SUCCESS ===")
+
         except Exception as e:
             db.rollback()
-            print("=== client_contact notification save error ===")
+            print("=== CLIENT CONTACT NOTIFICATION SAVE ERROR ===")
             print(repr(e))
             traceback.print_exc()
             flash("お問い合わせの保存に失敗しました。", "error")
             return redirect(url_for("client_contact"))
+
+        # 2) メール送信（失敗しても問い合わせ自体は保存済み）
+        if mail_settings_ready():
+            try:
+                print("=== CLIENT CONTACT MAIL SEND START ===")
+                log_mail_config("CLIENT_CONTACT")
+
+                msg = Message(
+                    subject=notify_title,
+                    recipients=[MAIL_TO],
+                    body=notify_message
+                )
+
+                mail.send(msg)
+                print("=== CLIENT CONTACT MAIL SEND SUCCESS ===")
+
+            except Exception as e:
+                print("=== CLIENT CONTACT MAIL SEND ERROR ===")
+                print(repr(e))
+                traceback.print_exc()
+        else:
+            print("=== CLIENT CONTACT MAIL SKIPPED: mail settings not ready ===")
 
         flash("お問い合わせを受け付けました。", "ok")
         return redirect(url_for("client_contact"))
