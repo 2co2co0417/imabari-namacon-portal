@@ -78,6 +78,17 @@ def inject_notification_status():
 
     return dict(has_unread=has_unread)
 
+def extract_photo_url(message):
+    if not message:
+        return ""
+
+    for line in message.splitlines():
+        line = line.strip()
+        if line.startswith("添付写真URL:"):
+            return line.replace("添付写真URL:", "", 1).strip()
+
+    return ""
+
 def create_notification(notification_type, title="", message=""):
     db = get_db()
     db.execute(
@@ -1061,13 +1072,19 @@ def owner_notice_delete(notice_id):
 @owner_required
 def owner_notifications():
     db = get_db()
-    notifications = db.execute(
+    rows = db.execute(
         """
         SELECT id, type, title, message, is_read, created_at
         FROM notifications
         ORDER BY is_read ASC, created_at DESC, id DESC
         """
     ).fetchall()
+
+    notifications = []
+    for row in rows:
+        item = dict(row)
+        item["photo_url"] = extract_photo_url(item.get("message", ""))
+        notifications.append(item)
 
     return render_template("owner_notifications.html", notifications=notifications)
 

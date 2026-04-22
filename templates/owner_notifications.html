@@ -42,7 +42,11 @@
 
                 {% if n["message"] %}
                 <div style="margin-top:12px; white-space:pre-wrap; line-height:1.7;">
+                  {% if n["type"] == "mix_report" and n["photo_url"] %}
+                    {{ n["message"].replace("添付写真URL: " ~ n["photo_url"], "") }}
+                  {% else %}
                     {{ n["message"] }}
+                  {% endif %}
                 </div>
                 {% endif %}
 
@@ -57,21 +61,14 @@
                 {% endif %}
                 {% endif %}
 
-                {% if n["type"] == "mix_report" and n["message"] and "添付写真:" in n["message"] %}
-                {% set photo_url = n["message"].split("添付写真:")[1].split("\n")[0].strip() %}
-                {% if photo_url %}
-                    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-                    
-                    <a href="{{ photo_url }}" target="_blank" rel="noopener noreferrer" class="btn-primary">
-                        📷 写真を開く
-                    </a>
+                {% if n["type"] == "mix_report" and n["photo_url"] %}
+                <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
 
-                    <a href="{{ photo_url }}" download class="btn-ghost">
-                        ⬇ ダウンロード
-                    </a>
+                  <a href="{{ n['photo_url'] }}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                    📷 写真を開く
+                  </a>
 
-                    </div>
-                {% endif %}
+                </div>
                 {% endif %}
 
 
