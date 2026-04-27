@@ -3,3 +3,5 @@ gunicorn
 python-dotenv
 Flask-Mail
 psycopg[binary]
+pytesseract
+Pillow
