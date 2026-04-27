@@ -1151,12 +1151,5 @@ def owner_notification_delete(notification_id):
     flash("通知を削除しました。", "ok")
     return redirect(url_for("owner_notifications"))        
 
-@app.route("/init-db")
-def init_db_column():
-    db = get_db()
-    db.execute("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS ocr_text TEXT;")
-    db.commit()
-    return "OK"
-
 if __name__ == "__main__":
     app.run(debug=True)
