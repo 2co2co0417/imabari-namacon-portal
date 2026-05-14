@@ -1544,3 +1544,8 @@ textarea:focus {
   font-size: 17px;
   font-weight: 700;
 }
+.btn-map-action{
+  font-size:1.2rem;
+  font-weight:700;
+  letter-spacing:0.03em;
+}
