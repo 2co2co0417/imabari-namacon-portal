@@ -52,6 +52,17 @@
         required
       ></textarea>
 
+      <!-- スパム対策：ハニーポット -->
+      <div style="display:none;">
+        <label>住所</label>
+        <input
+          type="text"
+          name="address_hp"
+          autocomplete="off"
+          tabindex="-1"
+        >
+      </div>
+
       <!-- 送信ボタン -->
       <div style="margin-top:14px;">
         <button class="btn-primary" type="submit">送信</button>
