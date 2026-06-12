@@ -1549,25 +1549,27 @@ textarea:focus {
   font-weight:700;
   letter-spacing:0.03em;
 }
-.line-btn{
-    background:#06C755;
-    color:#fff !important;
-    font-weight:bold;
-}
-
-.line-btn:hover{
-    opacity:0.9;
-}
-
-.line-qr-box{
+.line-box{
+    margin-top:16px;
     text-align:center;
-    margin-top:10px;
 }
 
-.line-qr-box img{
-    width:140px;
-    height:auto;
-    border-radius:8px;
+.line-add-btn{
+    display:inline-block;
+    background:#06C755;
+    color:#fff;
+    padding:12px 22px;
+    border-radius:10px;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.line-qr{
+    display:block;
+    width:150px;
+    max-width:70%;
+    margin:12px auto 0;
     background:#fff;
-    padding:5px;
+    padding:6px;
+    border-radius:8px;
 }
