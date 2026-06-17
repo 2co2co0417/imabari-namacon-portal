@@ -1074,7 +1074,7 @@ def owner_notifications():
     db = get_db()
     rows = db.execute(
         """
-        SELECT id, type, title, message, is_read, created_at
+        SELECT id, type, title, message, is_read, created_at, owner_comment
         FROM notifications
         ORDER BY is_read ASC, created_at DESC, id DESC
         """
@@ -1129,6 +1129,34 @@ def owner_notification_unread(notification_id):
 
     flash("通知を未確認に戻しました。", "ok")
     return redirect(url_for("owner_notifications"))    
+
+@app.route("/owner/notifications/<int:notification_id>/comment", methods=["POST"])
+@owner_required
+def owner_notification_comment(notification_id):
+    owner_comment = request.form.get("owner_comment", "").strip()
+
+    db = get_db()
+
+    notification = db.execute(
+        "SELECT id FROM notifications WHERE id = %s",
+        (notification_id,)
+    ).fetchone()
+
+    if not notification:
+        abort(404)
+
+    db.execute(
+        """
+        UPDATE notifications
+        SET owner_comment = %s
+        WHERE id = %s
+        """,
+        (owner_comment, notification_id)
+    )
+    db.commit()
+
+    flash("コメントを保存しました。", "ok")
+    return redirect(url_for("owner_notifications"))
 
 @app.route("/owner/notifications/<int:notification_id>/delete", methods=["POST"])
 @owner_required

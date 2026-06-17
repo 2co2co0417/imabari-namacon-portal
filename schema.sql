@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     type TEXT NOT NULL,
     title TEXT,
     message TEXT,
+    owner_comment TEXT,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

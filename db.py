@@ -35,4 +35,10 @@ def init_db(app):
             for statement in statements:
                 cur.execute(statement)
 
+        with db.cursor() as cur:
+            cur.execute("""
+                ALTER TABLE notifications
+                ADD COLUMN IF NOT EXISTS owner_comment TEXT
+            """)        
+
         db.commit()

@@ -14,6 +14,7 @@
         {% for n in notifications %}
           <div class="card inner-card" style="border:1px solid #ddd;">
             <div class="card-b">
+
               <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
                 <div>
                   <div style="font-weight:800; color:var(--dark-800);">
@@ -40,7 +41,7 @@
                 </div>
               </div>
 
-                {% if n["message"] %}
+              {% if n["message"] %}
                 <div style="margin-top:12px; white-space:pre-wrap; line-height:1.7;">
                   {% if n["type"] == "mix_report" and n["photo_url"] %}
                     {{ n["message"].replace("添付写真URL: " ~ n["photo_url"], "") }}
@@ -48,45 +49,59 @@
                     {{ n["message"] }}
                   {% endif %}
                 </div>
-                {% endif %}
+              {% endif %}
 
-                {% if n["type"] == "map" and n["message"] and "Googleマップ:" in n["message"] %}
+              {% if n["type"] == "map" and n["message"] and "Googleマップ:" in n["message"] %}
                 {% set map_url = n["message"].split("Googleマップ:")[1].split("\n")[0].strip() %}
                 {% if map_url %}
-                    <div style="margin-top:12px;">
+                  <div style="margin-top:12px;">
                     <a href="{{ map_url }}" target="_blank" rel="noopener noreferrer" class="btn-primary">
-                        地図を開く
+                      地図を開く
                     </a>
-                    </div>
+                  </div>
                 {% endif %}
-                {% endif %}
+              {% endif %}
 
-                {% if n["type"] == "mix_report" and n["photo_url"] %}
+              {% if n["type"] == "mix_report" and n["photo_url"] %}
                 <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-
                   <a href="{{ n['photo_url'] }}" target="_blank" rel="noopener noreferrer" class="btn-primary">
                     📷 写真を開く
                   </a>
-
                 </div>
-                {% endif %}
+              {% endif %}
 
+              <!-- 社内コメント欄 -->
+              <form method="post" action="{{ url_for('owner_notification_comment', notification_id=n['id']) }}" style="margin-top:18px;">
+                <label class="label">社内コメント</label>
+                <textarea
+                  class="input"
+                  name="owner_comment"
+                  rows="3"
+                  placeholder="例：電話済み、配車へ共有済み、確認待ち"
+                  style="width:100%; margin-top:6px;"
+                >{{ n["owner_comment"] or "" }}</textarea>
 
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+                <button type="submit" class="btn-primary" style="margin-top:8px;">
+                  コメントを保存
+                </button>
+              </form>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
                 {% if not n["is_read"] %}
-                    <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
+                  <form method="post" action="{{ url_for('owner_notification_read', notification_id=n['id']) }}">
                     <button type="submit" class="btn-primary">確認済みにする</button>
-                    </form>
+                  </form>
                 {% else %}
-                    <form method="post" action="{{ url_for('owner_notification_unread', notification_id=n['id']) }}">
+                  <form method="post" action="{{ url_for('owner_notification_unread', notification_id=n['id']) }}">
                     <button type="submit" class="btn-ghost">未確認に戻す</button>
-                    </form>
+                  </form>
                 {% endif %}
 
                 <form method="post" action="{{ url_for('owner_notification_delete', notification_id=n['id']) }}" onsubmit="return confirm('この通知を削除しますか？');">
-                    <button type="submit" class="btn-ghost">削除</button>
+                  <button type="submit" class="btn-ghost">削除</button>
                 </form>
-                </div>
+              </div>
+
             </div>
           </div>
         {% endfor %}
