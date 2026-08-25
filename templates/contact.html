@@ -8,9 +8,9 @@
     <h1 class="hero-title">お問い合わせ</h1>
   </div>
 
-  <div class="card-b" style="max-width:720px; margin: 0 auto;">
+  <div class="card-b" style="max-width:720px; margin:0 auto;">
 
-    <form method="post" class="form">
+    <form method="post" class="form" id="contactForm">
 
       <!-- 会社名 -->
       <label class="label">会社名</label>
@@ -19,6 +19,7 @@
         type="text"
         name="company"
         placeholder="例：○○建設株式会社"
+        maxlength="100"
         required
       >
 
@@ -29,6 +30,7 @@
         type="text"
         name="name"
         placeholder="例：田中 太郎"
+        maxlength="50"
         required
       >
 
@@ -39,6 +41,7 @@
         type="email"
         name="email"
         placeholder="例：tanaka@example.co.jp"
+        maxlength="200"
         required
       >
 
@@ -48,14 +51,37 @@
         class="textarea"
         name="message"
         rows="6"
+        maxlength="3000"
         placeholder="お問い合わせ内容をご記入ください"
         required
       ></textarea>
 
-      <!-- スパム対策：ハニーポット -->
-      <div style="display:none;">
-        <label>住所</label>
+      <!--
+        スパム対策①
+        ボットが自動入力しやすい隠し項目
+      -->
+      <div
+        aria-hidden="true"
+        style="
+          position:absolute;
+          left:-9999px;
+          width:1px;
+          height:1px;
+          overflow:hidden;
+        "
+      >
+        <label for="website">ウェブサイト</label>
         <input
+          id="website"
+          type="text"
+          name="website"
+          autocomplete="off"
+          tabindex="-1"
+        >
+
+        <label for="address_hp">住所</label>
+        <input
+          id="address_hp"
           type="text"
           name="address_hp"
           autocomplete="off"
@@ -63,18 +89,53 @@
         >
       </div>
 
+      <!--
+        スパム対策②
+        ページを開いてから送信するまでの時間
+      -->
+      <input
+        type="hidden"
+        name="form_started"
+        id="form_started"
+        value=""
+      >
+
       <!-- 送信ボタン -->
       <div style="margin-top:14px;">
-        <button class="btn-primary" type="submit">送信</button>
+        <button
+          class="btn-primary"
+          type="submit"
+          id="submitBtn"
+        >
+          送信
+        </button>
       </div>
 
     </form>
 
-    <div class="muted" style="margin-top:12px;">
-  
-    </div>
-
   </div>
 
 </div>
+
+<script>
+(function () {
+
+  const form = document.getElementById('contactForm');
+  const started = document.getElementById('form_started');
+  const submitBtn = document.getElementById('submitBtn');
+
+  // ページ表示時刻を記録
+  started.value = Date.now();
+
+  // 二重送信防止
+  form.addEventListener('submit', function () {
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中…';
+
+  });
+
+})();
+</script>
+
 {% endblock %}
