@@ -280,18 +280,54 @@ def contact():
         email = request.form.get("email", "").strip()
         message = request.form.get("message", "").strip()
 
+        # =====================================
+        # スパム・AIボット対策
+        # =====================================
+
+        # ハニーポット
+        address_hp = request.form.get("address_hp", "").strip()
+
+        # 人間は入力しない隠し項目に値があればボット扱い
+        if address_hp:
+            print("CONTACT BLOCKED: honeypot detected")
+            return "", 204
+
+        # 必須項目
+        if not company or not name or not email or not message:
+            print("CONTACT VALIDATION ERROR: required fields missing")
+            flash(
+                "会社名・お名前・メールアドレス・お問い合わせ内容を入力してください。",
+                "error"
+            )
+            return redirect(url_for("contact"))
+
+        # 異常に短い問い合わせを除外
+        if len(company) < 2 or len(name) < 2 or len(message) < 10:
+            print("CONTACT BLOCKED: message too short")
+            flash(
+                "お問い合わせ内容をもう少し詳しく入力してください。",
+                "error"
+            )
+            return redirect(url_for("contact"))
+
+        # 異常に長い自動投稿を除外
+        if (
+            len(company) > 100
+            or len(name) > 50
+            or len(email) > 200
+            or len(message) > 3000
+        ):
+            print("CONTACT BLOCKED: input too long")
+            return "", 204
+
         print("=== CONTACT POST START ===")
         print("company =", company)
         print("name =", name)
         print("email =", email)
         print("message_exists =", bool(message))
 
-        if not company or not name or not email or not message:
-            print("CONTACT VALIDATION ERROR: required fields missing")
-            flash("会社名・お名前・メールアドレス・お問い合わせ内容を入力してください。", "error")
-            return redirect(url_for("contact"))
-
         notify_title = f"お問い合わせ: {company} {name}"
+
         notify_message = f"""会社名: {company}
 お名前: {name}
 メール: {email}
@@ -302,7 +338,6 @@ def contact():
 
         try:
             print("=== CONTACT NOTIFICATION SAVE START ===")
-            print(notify_message)
 
             create_notification(
                 "contact",
@@ -317,9 +352,14 @@ def contact():
             print("error type =", type(e))
             print("error repr =", repr(e))
             traceback.print_exc()
-            flash("お問い合わせの受付に失敗しました。", "error")
+
+            flash(
+                "お問い合わせの受付に失敗しました。",
+                "error"
+            )
             return redirect(url_for("contact"))
 
+        # メール送信
         if mail_settings_ready():
             try:
                 print("=== CONTACT MAIL SEND START ===")
@@ -332,6 +372,7 @@ def contact():
                 )
 
                 mail.send(msg)
+
                 print("=== CONTACT MAIL SEND SUCCESS ===")
 
             except Exception as e:
@@ -339,10 +380,18 @@ def contact():
                 print("error type =", type(e))
                 print("error repr =", repr(e))
                 traceback.print_exc()
-        else:
-            print("=== CONTACT MAIL SKIPPED: mail settings not ready ===")
 
-        flash(f"お問い合わせを受け付けました。{name}様", "ok")
+        else:
+            print(
+                "=== CONTACT MAIL SKIPPED: "
+                "mail settings not ready ==="
+            )
+
+        flash(
+            f"お問い合わせを受け付けました。{name}様",
+            "ok"
+        )
+
         return redirect(url_for("contact"))
 
     return render_template("contact.html")
