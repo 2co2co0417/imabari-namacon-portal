@@ -310,7 +310,7 @@ def contact():
             )
             return redirect(url_for("contact"))
 
-        # 異常に長い自動投稿を除外
+        # 異常に長い投稿を除外
         if (
             len(company) > 100
             or len(name) > 50
@@ -319,6 +319,98 @@ def contact():
         ):
             print("CONTACT BLOCKED: input too long")
             return "", 204
+
+        # =====================================
+        # 営業・宣伝問い合わせ対策
+        # =====================================
+
+        sales_keywords = [
+            "サービスのご案内",
+            "ご案内いたします",
+            "ご提案",
+            "ご提案させて",
+            "営業",
+            "無料プラン",
+            "無料で始め",
+            "無料送信",
+            "特典",
+            "限定のご案内",
+            "ご登録はこちら",
+            "登録はこちら",
+            "月額",
+            "初期費用",
+            "最低利用期間",
+            "解約",
+            "導入しませんか",
+            "導入のご提案",
+            "業界最安",
+            "コスト削減",
+            "業務効率化",
+            "弊社サービス",
+            "当社サービス",
+            "サービスを運営",
+            "サービス詳細",
+            "お打ち合わせ",
+            "オンラインミーティング",
+            "商談",
+            "資料をお送り",
+            "資料請求",
+            "キャンペーン",
+        ]
+
+        message_lower = message.lower()
+
+        sales_score = 0
+
+        for keyword in sales_keywords:
+            if keyword.lower() in message_lower:
+                sales_score += 1
+
+        # URLが入っている営業文はさらに加点
+        if "http://" in message_lower or "https://" in message_lower:
+            sales_score += 2
+
+        # 長文営業メールはさらに加点
+        if len(message) >= 400:
+            sales_score += 1
+
+        # 「無料」「月額」「登録」などが複数含まれる場合
+        extra_words = [
+            "無料",
+            "月額",
+            "登録",
+            "サービス",
+            "導入",
+            "特典",
+            "費用",
+            "プラン",
+        ]
+
+        extra_count = sum(
+            1 for word in extra_words
+            if word in message
+        )
+
+        if extra_count >= 4:
+            sales_score += 2
+
+        # 一定以上なら営業・宣伝としてブロック
+        if sales_score >= 4:
+            print("CONTACT BLOCKED: suspected sales message")
+            print("sales_score =", sales_score)
+            print("company =", company)
+            print("email =", email)
+
+            # 送信者にはエラーを出さず、正常に送れたように見せる
+            flash(
+                "お問い合わせを受け付けました。",
+                "ok"
+            )
+            return redirect(url_for("contact"))
+
+        # =====================================
+        # 通常のお問い合わせ処理
+        # =====================================
 
         print("=== CONTACT POST START ===")
         print("company =", company)
